@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CAT Prep — Exam Intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .page-header { margin-bottom:32px; }
+    .page-header h1 { font-family:"Syne",sans-serif; font-size:28px; font-weight:800; letter-spacing:-0.5px; }
+    .page-header h1 span { color:var(--red); }
+    .page-header p { font-size:13px; color:var(--text3); margin-top:4px; }
+    .cat-section-row { margin-bottom:18px; }
+    .cat-section-row:last-of-type { margin-bottom:6px; }
+    .cat-section-info { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:6px; }
+    .cat-section-name { font-family:"Space Mono",monospace; font-size:18px; font-weight:700; letter-spacing:1px; }
+    .varc-n { color:var(--red); }
+    .dilr-n { color:var(--amber); }
+    .qa-n   { color:var(--teal); }
+    .cat-section-qs { font-family:"Inter",sans-serif; font-size:13px; font-weight:500; color:var(--text3); }
+    .cat-section-bar-wrap { height:6px; background:rgba(255,255,255,0.07); border-radius:3px; overflow:hidden; }
+    .cat-section-bar { height:100%; border-radius:3px; }
+    .cat-tip { font-family:"Inter",sans-serif; font-size:11px; font-weight:500; color:var(--text4); margin-top:10px; }
+    .score-target-table { width:100%; display:flex; flex-direction:column; }
+    .stt-head, .stt-row { display:grid; grid-template-columns:52px 1fr 1fr 1fr 1fr; align-items:center; padding:10px 0; }
+    .stt-head { border-bottom:1px solid var(--border); margin-bottom:2px; }
+    .stt-row  { border-bottom:1px solid rgba(255,255,255,0.05); }
+    .stt-row:last-child { border-bottom:none; }
+    .stt-col  { font-family:"Inter",sans-serif; font-size:11px; font-weight:600; letter-spacing:2px; text-transform:uppercase; text-align:center; }
+    .varc-col { color:var(--red); }
+    .dilr-col { color:var(--amber); }
+    .qa-col   { color:var(--teal); }
+    .total-col{ color:var(--text3); }
+    .stt-pct  { font-family:"Space Mono",monospace; font-size:15px; font-weight:700; }
+    .stt-val  { font-family:"Space Mono",monospace; font-size:16px; font-weight:700; color:rgba(255,255,255,0.8); text-align:center; }
+    .facts-grid { display:grid; grid-template-columns:repeat(6,1fr); gap:14px; }
+    .fact-item  { display:flex; flex-direction:column; gap:5px; }
+    .fact-val   { font-family:"Space Mono",monospace; font-size:22px; font-weight:700; color:var(--text); }
+    .fact-lbl   { font-family:"Inter",sans-serif; font-size:11px; font-weight:500; letter-spacing:1.5px; text-transform:uppercase; color:var(--text3); }
+    #dream-grid { display:flex; flex-direction:column; gap:0; }
+    .dream-item { padding:12px 0; border-bottom:1px solid var(--border); }
+    .dream-item:last-child { border-bottom:none; }
+    .dream-iim  { font-family:"Syne",sans-serif; font-size:15px; font-weight:700; color:var(--text); margin-bottom:8px; }
+    .dream-pkg-row { display:flex; align-items:center; gap:14px; margin-bottom:8px; }
+    .dream-median { font-family:"Space Mono",monospace; font-size:22px; font-weight:700; color:var(--text); }
+    .dream-peak   { font-family:"Inter",sans-serif; font-size:12px; font-weight:500; color:var(--text3); display:flex; align-items:center; gap:6px; }
+    .dream-peak-label { font-size:10px; letter-spacing:1.5px; text-transform:uppercase; opacity:0.6; }
+    .dream-bar-wrap { height:5px; background:rgba(255,255,255,0.07); border-radius:3px; overflow:hidden; }
+    .dream-bar { height:100%; border-radius:3px; }
+    .marking-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .mark-item { display:flex; flex-direction:column; gap:4px; padding:16px; background:rgba(255,255,255,0.04); border:1px solid var(--border); border-radius:12px; }
+    .mark-type { font-family:"Space Mono",monospace; font-size:28px; font-weight:700; }
+    .mark-desc { font-family:"Inter",sans-serif; font-size:12px; color:var(--text3); }
+    @media (max-width:600px) { .facts-grid { grid-template-columns:repeat(3,1fr); } .marking-grid { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+<nav class="nav">
+  <a class="nav-brand" href="index.html"><span class="nav-logo">CAT<span>.</span>prep</span></a>
+  <div class="nav-links">
+    <a href="index.html"   class="nav-link">Dashboard</a>
+    <a href="tracker.html" class="nav-link">QA Tracker</a>
+    <a href="intel.html"   class="nav-link active">Exam Intel</a>
+  </div>
+  <div class="nav-right">
+    <span class="nav-pulse"></span>
+    <span class="nav-clock js-clock">--:--:--</span>
+  </div>
+</nav>
+
+<main class="page">
+  <div class="page-header">
+    <h1>CAT Exam <span>Intelligence</span></h1>
+    <p>Structure, score targets, key facts & IIM placement data</p>
+  </div>
+
+  <div class="section-label">Exam Structure</div>
+  <div class="grid-2 mb-14">
+    <div class="card">
+      <div class="section-label">Section Breakdown</div>
+      <div class="cat-section-row">
+        <div class="cat-section-info"><span class="cat-section-name varc-n">VARC</span><span class="cat-section-qs">24 Qs · 40 min</span></div>
+        <div class="cat-section-bar-wrap"><div class="cat-section-bar" style="width:36%;background:var(--red)"></div></div>
+      </div>
+      <div class="cat-section-row">
+        <div class="cat-section-info"><span class="cat-section-name dilr-n">DILR</span><span class="cat-section-qs">20 Qs · 40 min</span></div>
+        <div class="cat-section-bar-wrap"><div class="cat-section-bar" style="width:30%;background:var(--amber)"></div></div>
+      </div>
+      <div class="cat-section-row">
+        <div class="cat-section-info"><span class="cat-section-name qa-n">QA</span><span class="cat-section-qs">22 Qs · 40 min</span></div>
+        <div class="cat-section-bar-wrap"><div class="cat-section-bar" style="width:33%;background:var(--teal)"></div></div>
+      </div>
+      <div class="cat-tip">Total: 66 Qs · 120 min · Sectional time limits apply</div>
+    </div>
+    <div class="card">
+      <div class="section-label">Score Targets — Per Section</div>
+      <div class="score-target-table">
+        <div class="stt-head">
+          <span></span>
+          <span class="stt-col varc-col">VARC</span>
+          <span class="stt-col dilr-col">DILR</span>
+          <span class="stt-col qa-col">QA</span>
+          <span class="stt-col total-col">Total</span>
+        </div>
+        <div class="stt-row"><span class="stt-pct" style="color:var(--red)">99.5+</span><span class="stt-val varc-col">48+</span><span class="stt-val dilr-col">42+</span><span class="stt-val qa-col">48+</span><span class="stt-val" style="color:var(--red)">125+</span></div>
+        <div class="stt-row"><span class="stt-pct" style="color:var(--orange)">99+</span><span class="stt-val varc-col">42+</span><span class="stt-val dilr-col">36+</span><span class="stt-val qa-col">42+</span><span class="stt-val" style="color:var(--orange)">110+</span></div>
+        <div class="stt-row"><span class="stt-pct" style="color:var(--amber)">98+</span><span class="stt-val varc-col">36+</span><span class="stt-val dilr-col">30+</span><span class="stt-val qa-col">36+</span><span class="stt-val" style="color:var(--amber)">98+</span></div>
+        <div class="stt-row"><span class="stt-pct" style="color:var(--teal)">95+</span><span class="stt-val varc-col">30+</span><span class="stt-val dilr-col">24+</span><span class="stt-val qa-col">30+</span><span class="stt-val" style="color:var(--teal)">88+</span></div>
+      </div>
+      <div class="cat-tip" style="color:rgba(224,85,85,0.5);margin-top:10px">Scaled scores out of 72 / 60 / 66 per section</div>
+    </div>
+  </div>
+
+  <div class="section-label">Marking Scheme</div>
+  <div class="card mb-14">
+    <div class="marking-grid">
+      <div class="mark-item"><span class="mark-type" style="color:var(--teal)">+3</span><span class="mark-desc">Correct MCQ answer</span></div>
+      <div class="mark-item"><span class="mark-type" style="color:var(--red)">−1</span><span class="mark-desc">Wrong MCQ answer</span></div>
+      <div class="mark-item"><span class="mark-type" style="color:var(--teal)">+3</span><span class="mark-desc">Correct TITA (type-in) answer</span></div>
+      <div class="mark-item"><span class="mark-type" style="color:var(--text3)">0</span><span class="mark-desc">Wrong / unattempted TITA — no penalty</span></div>
+    </div>
+  </div>
+
+  <div class="section-label">Key Facts</div>
+  <div class="card mb-14">
+    <div class="facts-grid">
+      <div class="fact-item"><span class="fact-val accent-red">~3L</span><span class="fact-lbl">Applicants/yr</span></div>
+      <div class="fact-item"><span class="fact-val accent-amber">~4200</span><span class="fact-lbl">IIM seats total</span></div>
+      <div class="fact-item"><span class="fact-val accent-teal">−1</span><span class="fact-lbl">Wrong MCQ penalty</span></div>
+      <div class="fact-item"><span class="fact-val">+3</span><span class="fact-lbl">Correct MCQ marks</span></div>
+      <div class="fact-item"><span class="fact-val accent-red">~1.4%</span><span class="fact-lbl">Acceptance rate</span></div>
+      <div class="fact-item"><span class="fact-val accent-amber">TITA</span><span class="fact-lbl">No penalty NAs</span></div>
+    </div>
+  </div>
+
+  <div class="section-label">Section Strategy</div>
+  <div class="grid-3 mb-14">
+    <div class="card" style="border-top:2px solid var(--red)">
+      <div style="font-family:'Space Mono',monospace;font-size:16px;font-weight:700;color:var(--red);margin-bottom:10px">VARC</div>
+      <ul style="list-style:none;display:flex;flex-direction:column;gap:8px;">
+        <li style="font-size:13px;color:var(--text3)">📖 Read editorials daily</li>
+        <li style="font-size:13px;color:var(--text3)">🎯 RC is 75% of VARC</li>
+        <li style="font-size:13px;color:var(--text3)">✂️ Skip VA if RC is weak</li>
+        <li style="font-size:13px;color:var(--text3)">⏱ Spend max 8 min/RC set</li>
+      </ul>
+    </div>
+    <div class="card" style="border-top:2px solid var(--amber)">
+      <div style="font-family:'Space Mono',monospace;font-size:16px;font-weight:700;color:var(--amber);margin-bottom:10px">DILR</div>
+      <ul style="list-style:none;display:flex;flex-direction:column;gap:8px;">
+        <li style="font-size:13px;color:var(--text3)">🔍 Set selection is key</li>
+        <li style="font-size:13px;color:var(--text3)">📊 3 fully-solved sets wins</li>
+        <li style="font-size:13px;color:var(--text3)">🚫 Don't get stuck on one</li>
+        <li style="font-size:13px;color:var(--text3)">🔁 Attempt 4–5, solve 3–4</li>
+      </ul>
+    </div>
+    <div class="card" style="border-top:2px solid var(--teal)">
+      <div style="font-family:'Space Mono',monospace;font-size:16px;font-weight:700;color:var(--teal);margin-bottom:10px">QA</div>
+      <ul style="list-style:none;display:flex;flex-direction:column;gap:8px;">
+        <li style="font-size:13px;color:var(--text3)">⚡ Speed + accuracy both</li>
+        <li style="font-size:13px;color:var(--text3)">🔢 Arithmetic is 40%+</li>
+        <li style="font-size:13px;color:var(--text3)">🛡 Mark easy Qs first</li>
+        <li style="font-size:13px;color:var(--text3)">✋ Leave hard ones last</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section-label">The Dream — IIM Final Placements 2024</div>
+  <div class="card mb-14">
+    <div id="dream-grid">
+      <div class="dream-item"><div class="dream-iim">IIM Ahmedabad</div><div class="dream-pkg-row"><span class="dream-median">₹35 LPA</span><span class="dream-peak"><span class="dream-peak-label">Peak</span> ₹1.7 CR</span></div><div class="dream-bar-wrap"><div class="dream-bar" style="width:100%;background:linear-gradient(90deg,var(--red),#ff8a65)"></div></div></div>
+      <div class="dream-item"><div class="dream-iim">IIM Bangalore</div><div class="dream-pkg-row"><span class="dream-median">₹34.1 LPA</span><span class="dream-peak"><span class="dream-peak-label">Peak</span> ₹1.13 CR</span></div><div class="dream-bar-wrap"><div class="dream-bar" style="width:97%;background:linear-gradient(90deg,var(--red),#ff8a65)"></div></div></div>
+      <div class="dream-item"><div class="dream-iim">IIM Calcutta</div><div class="dream-pkg-row"><span class="dream-median">₹32 LPA</span><span class="dream-peak"><span class="dream-peak-label">Peak</span> ₹90 LPA</span></div><div class="dream-bar-wrap"><div class="dream-bar" style="width:91%;background:linear-gradient(90deg,var(--orange),var(--amber))"></div></div></div>
+      <div class="dream-item"><div class="dream-iim">IIM Lucknow</div><div class="dream-pkg-row"><span class="dream-median">₹30.5 LPA</span><span class="dream-peak"><span class="dream-peak-label">Peak</span> ₹72 LPA</span></div><div class="dream-bar-wrap"><div class="dream-bar" style="width:87%;background:linear-gradient(90deg,var(--amber),#a8c55d)"></div></div></div>
+      <div class="dream-item"><div class="dream-iim">IIM Kozhikode</div><div class="dream-pkg-row"><span class="dream-median">₹28.9 LPA</span><span class="dream-peak"><span class="dream-peak-label">Peak</span> ₹65 LPA</span></div><div class="dream-bar-wrap"><div class="dream-bar" style="width:82%;background:linear-gradient(90deg,#a8c55d,var(--teal))"></div></div></div>
+      <div class="dream-item"><div class="dream-iim">IIM Indore</div><div class="dream-pkg-row"><span class="dream-median">₹27.2 LPA</span><span class="dream-peak"><span class="dream-peak-label">Peak</span> ₹60 LPA</span></div><div class="dream-bar-wrap"><div class="dream-bar" style="width:78%;background:linear-gradient(90deg,var(--teal),#4db8a4)"></div></div></div>
+    </div>
+    <div class="cat-tip" style="margin-top:14px">Median CTC · Source: official placement reports 2024</div>
+  </div>
+
+  <div class="section-label">CAT 2025 Calendar</div>
+  <div class="card mb-14">
+    <div style="display:flex;flex-direction:column;gap:0">
+      <div style="display:grid;grid-template-columns:120px 1fr;padding:12px 0;border-bottom:1px solid var(--border);align-items:center"><span style="font-family:'Space Mono',monospace;font-size:13px;color:var(--amber);font-weight:700">Jul–Aug</span><span style="font-size:14px;color:var(--text3)">Registration opens</span></div>
+      <div style="display:grid;grid-template-columns:120px 1fr;padding:12px 0;border-bottom:1px solid var(--border);align-items:center"><span style="font-family:'Space Mono',monospace;font-size:13px;color:var(--amber);font-weight:700">Sep</span><span style="font-size:14px;color:var(--text3)">Registration closes · Admit card release</span></div>
+      <div style="display:grid;grid-template-columns:120px 1fr;padding:12px 0;border-bottom:1px solid var(--border);align-items:center;background:rgba(224,85,85,0.06);border-radius:6px"><span style="font-family:'Space Mono',monospace;font-size:13px;color:var(--red);font-weight:700">Nov 23</span><span style="font-size:14px;color:var(--text)">🎯 CAT 2025 Exam Day</span></div>
+      <div style="display:grid;grid-template-columns:120px 1fr;padding:12px 0;border-bottom:1px solid var(--border);align-items:center"><span style="font-family:'Space Mono',monospace;font-size:13px;color:var(--text3);font-weight:700">Jan</span><span style="font-size:14px;color:var(--text3)">Results declared</span></div>
+      <div style="display:grid;grid-template-columns:120px 1fr;padding:12px 0;align-items:center"><span style="font-family:'Space Mono',monospace;font-size:13px;color:var(--text3);font-weight:700">Feb–May</span><span style="font-size:14px;color:var(--text3)">GD/PI/WAT rounds</span></div>
+    </div>
+  </div>
+
+  <div class="ticker-wrap"><span class="ticker-inner">STUDY HARD &nbsp;·&nbsp; STAY FOCUSED &nbsp;·&nbsp; CAT 2025 &nbsp;·&nbsp; EVERY HOUR COUNTS &nbsp;·&nbsp; NO DAYS OFF &nbsp;·&nbsp; IIM AWAITS &nbsp;·&nbsp; PERCENTILE MATTERS &nbsp;·&nbsp; PUT IN THE WORK &nbsp;·&nbsp; MOCK. ANALYSE. REPEAT &nbsp;·&nbsp; TIME IS RUNNING &nbsp;·&nbsp; DILR IS NON-NEGOTIABLE &nbsp;·&nbsp; VARC EVERY SINGLE DAY &nbsp;·&nbsp; QA SPEED IS EARNED &nbsp;·&nbsp; STUDY HARD &nbsp;·&nbsp; STAY FOCUSED &nbsp;·&nbsp; CAT 2025 &nbsp;·&nbsp; EVERY HOUR COUNTS &nbsp;·&nbsp; NO DAYS OFF &nbsp;·&nbsp; IIM AWAITS &nbsp;·&nbsp; PERCENTILE MATTERS &nbsp;·&nbsp; PUT IN THE WORK &nbsp;·&nbsp; MOCK. ANALYSE. REPEAT &nbsp;·&nbsp; TIME IS RUNNING &nbsp;·&nbsp; DILR IS NON-NEGOTIABLE &nbsp;·&nbsp; VARC EVERY SINGLE DAY &nbsp;·&nbsp; QA SPEED IS EARNED &nbsp;·&nbsp;</span></div>
+</main>
+
+<script>
+  function tickClock() {
+    const now = new Date();
+    const s = String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0')+':'+String(now.getSeconds()).padStart(2,'0');
+    document.querySelectorAll('.js-clock').forEach(el => el.textContent = s);
+  }
+  tickClock(); setInterval(tickClock, 1000);
+  (function(){
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="7" fill="#09090e"/><text x="16" y="22" font-family="monospace" font-weight="700" font-size="14" fill="#e05555" text-anchor="middle">CAT</text></svg>`;
+    const link = document.createElement("link"); link.rel="icon"; link.type="image/svg+xml";
+    link.href="data:image/svg+xml,"+encodeURIComponent(svg); document.head.appendChild(link);
+  })();
+</script>
+</body>
+</html>
