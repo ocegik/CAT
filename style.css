@@ -1,0 +1,264 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap");
+
+/* ─────────────────────────────────────────────
+   DESIGN TOKENS
+   ───────────────────────────────────────────── */
+:root {
+  --bg:       #09090e;
+  --bg2:      #0f0f16;
+  --bg3:      #14141e;
+  --border:   rgba(255,255,255,0.08);
+  --border2:  rgba(255,255,255,0.13);
+
+  --text:     #ffffff;
+  --text2:    rgba(255,255,255,0.6);
+  --text3:    rgba(255,255,255,0.35);
+  --text4:    rgba(255,255,255,0.22);
+
+  --red:      #e05555;
+  --amber:    #d4aa30;
+  --teal:     #5dcaa5;
+  --orange:   #e07a35;
+
+  --radius:   16px;
+  --radius-sm:10px;
+}
+
+/* ─────────────────────────────────────────────
+   RESET & BASE
+   ───────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: "Inter", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* subtle grid texture */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.012) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.012) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ─────────────────────────────────────────────
+   NAVIGATION
+   ───────────────────────────────────────────── */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(9,9,14,0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+.nav-logo {
+  font-family: "Syne", sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--text);
+}
+.nav-logo span { color: var(--red); }
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.nav-link {
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text3);
+  text-decoration: none;
+  padding: 6px 14px;
+  border-radius: 8px;
+  transition: color 0.15s, background 0.15s;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+}
+.nav-link:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+.nav-link.active { color: var(--text); background: rgba(255,255,255,0.07); }
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.nav-clock {
+  font-family: "Space Mono", monospace;
+  font-size: 13px;
+  color: var(--text3);
+  letter-spacing: 1px;
+}
+.nav-pulse {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--red);
+  animation: blink 1.4s ease-in-out infinite;
+  flex-shrink: 0;
+}
+@keyframes blink {
+  0%,100% { opacity:1; transform:scale(1); }
+  50%      { opacity:0.3; transform:scale(0.6); }
+}
+
+/* ─────────────────────────────────────────────
+   PAGE WRAPPER
+   ───────────────────────────────────────────── */
+.page {
+  position: relative;
+  z-index: 1;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 36px 28px 64px;
+}
+
+/* ─────────────────────────────────────────────
+   TYPE HIERARCHY
+   ───────────────────────────────────────────── */
+.t1 { font-family:"Syne",sans-serif; font-weight:800; }
+.t2 { font-family:"Space Mono",monospace; font-weight:700; }
+.t3 { font-family:"Space Mono",monospace; font-weight:700; font-size:15px; }
+.section-label {
+  font-family: "Inter", sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 2.5px;
+  color: var(--text4);
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+
+/* ─────────────────────────────────────────────
+   CARDS
+   ───────────────────────────────────────────── */
+.card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px 24px;
+}
+.card-sm {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 18px;
+}
+.card + .card { margin-top: 14px; }
+
+/* ─────────────────────────────────────────────
+   PROGRESS BARS
+   ───────────────────────────────────────────── */
+.prog-track {
+  height: 6px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.prog-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.8s ease;
+}
+.fill-red   { background: var(--red); }
+.fill-amber { background: var(--amber); }
+.fill-teal  { background: var(--teal); }
+.fill-dim   { background: rgba(255,255,255,0.3); }
+
+/* gradient fills */
+.fill-grad-amber { background: linear-gradient(90deg,#b87a10,var(--amber)); }
+.fill-grad-teal  { background: linear-gradient(90deg,#0e9870,var(--teal)); }
+
+/* ─────────────────────────────────────────────
+   ACCENTS
+   ───────────────────────────────────────────── */
+.accent-red    { color: var(--red); }
+.accent-amber  { color: var(--amber); }
+.accent-teal   { color: var(--teal); }
+.accent-orange { color: var(--orange); }
+
+/* ─────────────────────────────────────────────
+   TICKER
+   ───────────────────────────────────────────── */
+.ticker-wrap {
+  overflow: hidden;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 0;
+  margin-top: 40px;
+}
+.ticker-inner {
+  display: inline-block;
+  white-space: nowrap;
+  animation: ticker 40s linear infinite;
+  font-family: "Space Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--text4);
+  text-transform: uppercase;
+}
+@keyframes ticker {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* ─────────────────────────────────────────────
+   UTILITIES
+   ───────────────────────────────────────────── */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; }
+.flex-between { display:flex; justify-content:space-between; align-items:center; }
+.flex-center  { display:flex; align-items:center; }
+.gap-8  { gap: 8px; }
+.gap-12 { gap: 12px; }
+.mb-8   { margin-bottom: 8px; }
+.mb-12  { margin-bottom: 12px; }
+.mb-14  { margin-bottom: 14px; }
+.mb-28  { margin-bottom: 28px; }
+.mb-36  { margin-bottom: 36px; }
+
+/* ─────────────────────────────────────────────
+   FLASHING
+   ───────────────────────────────────────────── */
+.flashing { animation: flash-kf 0.35s ease-out; }
+@keyframes flash-kf {
+  0%   { opacity: 0.3; }
+  100% { opacity: 1; }
+}
+
+/* ─────────────────────────────────────────────
+   RESPONSIVE
+   ───────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .page { padding: 24px 16px 48px; }
+  .nav  { padding: 0 16px; }
+  .grid-2, .grid-4 { grid-template-columns: 1fr; }
+  .grid-3 { grid-template-columns: 1fr 1fr; }
+}
