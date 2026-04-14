@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap");
 
 /* ─────────────────────────────────────────────
    DESIGN TOKENS
@@ -76,10 +76,10 @@ body::before {
   text-decoration: none;
 }
 .nav-logo {
-  font-family: "Syne", sans-serif;
-  font-size: 18px;
-  font-weight: 800;
-  letter-spacing: -0.5px;
+  font-family: "Inter", sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
   color: var(--text);
 }
 .nav-logo span { color: var(--red); }
@@ -111,9 +111,9 @@ body::before {
 }
 .nav-clock {
   font-family: "Space Mono", monospace;
-  font-size: 13px;
+  font-size: 12px;
   color: var(--text3);
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
 }
 .nav-pulse {
   width: 7px; height: 7px;
@@ -141,14 +141,14 @@ body::before {
 /* ─────────────────────────────────────────────
    TYPE HIERARCHY
    ───────────────────────────────────────────── */
-.t1 { font-family:"Syne",sans-serif; font-weight:800; }
+.t1 { font-family:"Inter",sans-serif; font-weight:700; }
 .t2 { font-family:"Space Mono",monospace; font-weight:700; }
 .t3 { font-family:"Space Mono",monospace; font-weight:700; font-size:15px; }
 .section-label {
   font-family: "Inter", sans-serif;
   font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 2.5px;
+  font-weight: 600;
+  letter-spacing: 1px;
   color: var(--text4);
   text-transform: uppercase;
   margin-bottom: 14px;
@@ -216,10 +216,10 @@ body::before {
   display: inline-block;
   white-space: nowrap;
   animation: ticker 40s linear infinite;
-  font-family: "Space Mono", monospace;
+  font-family: "Inter", sans-serif;
   font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 2px;
+  font-weight: 600;
+  letter-spacing: 1px;
   color: var(--text4);
   text-transform: uppercase;
 }
