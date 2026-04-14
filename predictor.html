@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CAT Prep — Call Predictor</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* ── PAGE HEADER ── */
+    .page-header { margin-bottom: 28px; }
+    .page-header h1 {
+      font-family: "Syne", sans-serif;
+      font-size: 28px; font-weight: 800;
+      letter-spacing: -0.5px; line-height: 1.1;
+    }
+    .page-header h1 span { color: var(--red); }
+    .page-header p { font-size: 13px; color: var(--text3); margin-top: 4px; }
+
+    /* ── PERCENTILE CONTROL ── */
+    .pct-control {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .pct-label {
+      font-size: 11px; font-weight: 600;
+      letter-spacing: 2px; text-transform: uppercase;
+      color: var(--text3); white-space: nowrap;
+    }
+    .pct-slider-wrap { flex: 1; min-width: 200px; }
+    input[type=range] {
+      width: 100%;
+      -webkit-appearance: none;
+      height: 5px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 3px;
+      outline: none;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: var(--amber);
+      cursor: pointer;
+      box-shadow: 0 0 0 4px rgba(212,170,48,0.18);
+    }
+    .pct-big {
+      font-family: "Syne", sans-serif;
+      font-size: 40px; font-weight: 800;
+      color: var(--amber);
+      line-height: 1;
+      min-width: 80px;
+      text-align: right;
+    }
+
+    /* ── WARNING BANNER ── */
+    .warn-banner {
+      font-size: 12px; color: var(--amber);
+      background: rgba(212,170,48,0.07);
+      border: 1px solid rgba(212,170,48,0.2);
+      border-radius: 10px;
+      padding: 10px 16px;
+      margin-bottom: 16px;
+    }
+
+    /* ── SUMMARY STRIP ── */
+    .summary-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    @media(max-width:520px) { .summary-strip { grid-template-columns: 1fr 1fr; } }
+    .sum-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      text-align: center;
+      transition: border-color 0.2s;
+    }
+    .sum-num {
+      font-family: "Syne", sans-serif;
+      font-size: 26px; font-weight: 800;
+      line-height: 1; display: block; margin-bottom: 4px;
+    }
+    .sum-lbl {
+      font-size: 10px; color: var(--text3);
+      text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600;
+    }
+    .sum-safe   .sum-num { color: #3ecf8e; }
+    .sum-target .sum-num { color: #a3d94f; }
+    .sum-stretch .sum-num { color: var(--amber); }
+    .sum-out    .sum-num { color: var(--red); }
+
+    /* ── FILTER ROW ── */
+    .top-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+    .search-wrap {
+      margin-left: auto;
+      position: relative;
+    }
+    .search-wrap input {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      color: var(--text);
+      font-family: "Inter", sans-serif;
+      font-size: 13px;
+      padding: 6px 14px 6px 32px;
+      outline: none;
+      width: 200px;
+      transition: border-color 0.2s;
+    }
+    .search-wrap input:focus { border-color: var(--border2); }
+    .search-wrap input::placeholder { color: var(--text3); }
+    .search-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--text3); font-size: 13px; pointer-events: none; }
+
+    /* ── ZONE HEADERS ── */
+    .zone-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 22px 0 10px;
+    }
+    .zone-pill {
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      padding: 4px 12px; border-radius: 20px; white-space: nowrap;
+    }
+    .zone-pill.safe    { background: rgba(62,207,142,0.12); color: #3ecf8e; }
+    .zone-pill.target  { background: rgba(163,217,79,0.12); color: #a3d94f; }
+    .zone-pill.stretch { background: rgba(212,170,48,0.12); color: var(--amber); }
+    .zone-pill.out     { background: rgba(224,85,85,0.12);  color: var(--red); }
+    .zone-divider { flex: 1; height: 1px; background: var(--border); }
+    .zone-count { font-size: 11px; color: var(--text3); white-space: nowrap; }
+
+    /* ── COLLEGE CARDS ── */
+    .college-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 8px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    .college-card:hover { border-color: var(--border2); }
+    .college-card.expanded { border-color: var(--border2); }
+
+    .cc-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 13px 18px;
+    }
+    .pct-badge {
+      min-width: 54px;
+      text-align: center;
+      padding: 7px 8px;
+      border-radius: 10px;
+      font-family: "Space Mono", monospace;
+      font-size: 13px; font-weight: 700;
+      flex-shrink: 0;
+    }
+    .pct-badge.safe    { background: rgba(62,207,142,0.12); color: #3ecf8e; }
+    .pct-badge.target  { background: rgba(163,217,79,0.12); color: #a3d94f; }
+    .pct-badge.stretch { background: rgba(212,170,48,0.12); color: var(--amber); }
+    .pct-badge.out     { background: rgba(224,85,85,0.12);  color: var(--red); }
+
+    .cc-info { flex: 1; min-width: 0; }
+    .cc-name {
+      font-family: "Syne", sans-serif;
+      font-size: 14px; font-weight: 700;
+      color: var(--text); margin-bottom: 4px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .cc-meta { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+    .type-pill {
+      font-size: 10px; padding: 2px 8px;
+      border-radius: 10px; font-weight: 600;
+      border: 1px solid; white-space: nowrap;
+    }
+    .type-pill-IIM      { border-color: rgba(212,170,48,0.35); color: var(--amber); background: rgba(212,170,48,0.08); }
+    .type-pill-NewIIM   { border-color: rgba(163,217,79,0.35); color: #a3d94f; background: rgba(163,217,79,0.08); }
+    .type-pill-IIT      { border-color: rgba(93,202,165,0.35); color: var(--teal); background: rgba(93,202,165,0.08); }
+    .type-pill-DU       { border-color: rgba(196,181,253,0.35); color: #c4b5fd; background: rgba(196,181,253,0.08); }
+    .type-pill-Other    { border-color: rgba(224,122,53,0.35); color: var(--orange); background: rgba(224,122,53,0.08); }
+
+    .gap-text { font-size: 11px; font-weight: 600; }
+    .gap-pos { color: #3ecf8e; }
+    .gap-neg { color: var(--red); }
+
+    .cc-chev { color: var(--text3); font-size: 11px; flex-shrink: 0; transition: transform 0.2s; }
+    .college-card.expanded .cc-chev { transform: rotate(180deg); }
+
+    /* Detail panel */
+    .cc-detail {
+      display: none;
+      padding: 0 18px 16px;
+      border-top: 1px solid var(--border);
+    }
+    .college-card.expanded .cc-detail { display: block; }
+    .cc-detail-text {
+      font-size: 13px; color: var(--text3);
+      line-height: 1.7; padding: 14px 0 12px;
+    }
+    .cc-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+    .cc-chip {
+      font-size: 11px; color: var(--text3);
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 8px; padding: 4px 10px;
+    }
+    .cc-chip span { color: var(--text); font-weight: 600; }
+
+    .no-results {
+      text-align: center; color: var(--text3);
+      font-size: 14px; padding: 48px 0;
+    }
+
+    @media(max-width:600px) {
+      .pct-control { gap: 12px; }
+      .pct-big { font-size: 30px; }
+      .search-wrap { margin-left: 0; }
+      .search-wrap input { width: 100%; }
+      .top-row { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav class="nav">
+  <a class="nav-brand" href="index.html">
+    <span class="nav-logo">CAT<span>.</span>prep</span>
+  </a>
+  <div class="nav-links">
+    <a href="index.html"      class="nav-link">Dashboard</a>
+    <a href="tracker.html"   class="nav-link">QA Tracker</a>
+    <a href="intel.html"     class="nav-link">Exam Intel</a>
+    <a href="predictor.html" class="nav-link active">Call Predictor</a>
+  </div>
+  <div class="nav-right">
+    <span class="nav-pulse"></span>
+    <span class="nav-clock js-clock">--:--:--</span>
+  </div>
+</nav>
+
+<main class="page">
+
+  <div class="page-header">
+    <h1>Call <span>Predictor</span></h1>
+    <p>Set your target percentile to see which colleges you're likely, borderline, or unlikely to receive interview calls from</p>
+  </div>
+
+  <!-- Percentile slider -->
+  <div class="pct-control">
+    <span class="pct-label">Your Percentile</span>
+    <div class="pct-slider-wrap">
+      <input type="range" min="70" max="100" step="0.5" value="85" id="pctSlider">
+    </div>
+    <span class="pct-big" id="pctVal">85.0</span>
+  </div>
+
+  <!-- Warning -->
+  <div class="warn-banner">
+    ⚠ Cutoffs shown are the <strong>bare minimum</strong> eligibility — seats fill significantly above them due to competition. "Comfortable" here means 2+ points above cutoff, which is still not a guarantee.
+  </div>
+
+  <!-- Summary -->
+  <div class="summary-strip">
+    <div class="sum-card sum-safe">
+      <span class="sum-num" id="cnt-safe">0</span>
+      <span class="sum-lbl">Comfortable</span>
+    </div>
+    <div class="sum-card sum-target">
+      <span class="sum-num" id="cnt-target">0</span>
+      <span class="sum-lbl">Borderline</span>
+    </div>
+    <div class="sum-card sum-stretch">
+      <span class="sum-num" id="cnt-stretch">0</span>
+      <span class="sum-lbl">Stretch</span>
+    </div>
+    <div class="sum-card sum-out">
+      <span class="sum-num" id="cnt-out">0</span>
+      <span class="sum-lbl">Out of reach</span>
+    </div>
+  </div>
+
+  <!-- Filters + search -->
+  <div class="top-row">
+    <span style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;font-weight:600;">Filter:</span>
+    <button class="filter-btn active" onclick="setType('all',this)">All</button>
+    <button class="filter-btn" onclick="setType('IIM',this)">Old IIMs</button>
+    <button class="filter-btn" onclick="setType('New IIM',this)">New IIMs</button>
+    <button class="filter-btn" onclick="setType('IIT',this)">IIT Schools</button>
+    <button class="filter-btn" onclick="setType('DU',this)">DU / DSE</button>
+    <button class="filter-btn" onclick="setType('Other',this)">Others</button>
+    <div class="search-wrap">
+      <span class="search-icon">⌕</span>
+      <input type="text" id="searchBox" placeholder="Search college..." oninput="onSearch(this.value)">
+    </div>
+  </div>
+
+  <div id="collegeList"></div>
+
+</main>
+
+<script>
+  // ── LIVE CLOCK ──
+  function tickClock() {
+    const now = new Date();
+    const s = String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0')+':'+String(now.getSeconds()).padStart(2,'0');
+    document.querySelectorAll('.js-clock').forEach(el => el.textContent = s);
+  }
+  tickClock(); setInterval(tickClock, 1000);
+
+  // ── FAVICON ──
+  (function(){
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="7" fill="#09090e"/><text x="16" y="22" font-family="monospace" font-weight="700" font-size="14" fill="#e05555" text-anchor="middle">CAT</text></svg>`;
+    const link = document.createElement("link"); link.rel="icon"; link.type="image/svg+xml";
+    link.href="data:image/svg+xml,"+encodeURIComponent(svg); document.head.appendChild(link);
+  })();
+
+  // ── DATA ──
+  const colleges = [
+    // OLD / ESTABLISHED IIMs
+    { name:"IIM Ahmedabad (PGP)", req:99.81, tag:"IIM — Top 3 · Est. 1961", type:"IIM", varc:65, dilr:65, qa:65, overall:75, info:"The pinnacle of Indian management education. Known globally for its case-study method and legendary alumni. Average placements among the highest in Asia. Only near-perfect scorers make it. Profile — academics, work experience, and extracurriculars — matters enormously at this stage." },
+    { name:"IIM Bangalore (PGP)", req:99.79, tag:"IIM — Top 3 · Est. 1973", type:"IIM", varc:70, dilr:70, qa:70, overall:75, info:"Neck-and-neck with IIMA. Extremely strong in finance and consulting. Located in India's tech capital. Known for its collaborative culture and diverse peer group. Also runs PGPBA (analytics) as a separate program." },
+    { name:"IIM Calcutta (PGP)", req:99.25, tag:"IIM — Top 3 · Est. 1961", type:"IIM", varc:70, dilr:65, qa:65, overall:75, info:"Third pillar of the old IIM trinity. Historically the strongest IIM in finance. Very rigorous academic structure. Slightly lower cutoff than IIMA/B but still extraordinarily competitive. Has produced many top finance professionals in India." },
+    { name:"IIM Lucknow (PGP)", req:97.96, tag:"IIM — Top 6 · Est. 1984", type:"IIM", varc:77, dilr:77, qa:77, overall:82, info:"Part of the old IIM group. Has the highest sectional cutoffs among IIMs — all three sections need 77+. Strong in marketing and HR. Beautiful campus in Lucknow. One weak section will eliminate you here even with a high overall." },
+    { name:"IIM Kozhikode (PGP)", req:98.09, tag:"IIM — Top 6 · Est. 1996", type:"IIM", varc:65, dilr:65, qa:65, overall:75, info:"One of the second-generation IIMs that has grown significantly. Has the most lenient sectional cutoffs among top IIMs at 65 each — great if you have an uneven section profile. Located on a scenic hilltop campus in Kerala." },
+    { name:"IIM Indore (PGP)", req:100.0, tag:"IIM — Top 6 (Gen Male) · Est. 1996", type:"IIM", varc:70, dilr:70, qa:70, overall:80, info:"Shown as 100 for general male category — the most overrepresented group. IIM Indore also runs IPM (5-year integrated) and various specialised programs. Category plays a massive role here." },
+    { name:"IIM Shillong (PGP)", req:94.0, tag:"IIM — Est. 2007", type:"IIM", varc:80, dilr:80, qa:80, overall:85, info:"Located in the scenic Northeast. One of the smaller IIMs with a focus on sustainability and social entrepreneurship. Known for its 'green MBA.' Sectional cutoffs are high relative to its overall cutoff." },
+    { name:"IIM Bangalore PGPBA", req:99.73, tag:"IIM B — Business Analytics", type:"IIM", varc:70, dilr:70, qa:70, overall:75, info:"Post Graduate Programme in Business Analytics at IIM Bangalore. Nearly same cutoff as PGP. For students targeting data science + management. Placements are strong given IIMB brand. Need strong quant skills. Very few seats." },
+    { name:"IIM Lucknow MBA-ABM", req:98.44, tag:"IIM L — Agri Business", type:"IIM", varc:72, dilr:72, qa:72, overall:77, info:"MBA in Agribusiness Management at IIM Lucknow. Separate from flagship PGP. For students interested in agriculture, rural markets, agri-FMCG. IIM Lucknow brand applies." },
+    { name:"IIM Lucknow MBA-SM", req:96.54, tag:"IIM L — Sustainable Mgmt (Work ex 24m)", type:"IIM", varc:72, dilr:72, qa:72, overall:77, info:"Sustainable Management at IIM Lucknow. Requires minimum 24 months work experience — non-negotiable. For working professionals only. Growing relevance with ESG focus in corporates." },
+    { name:"IIM Kozhikode PGP-Finance", req:99.99, tag:"IIM K — Finance Specialist", type:"IIM", varc:65, dilr:70, qa:75, overall:null, info:"Specialised finance program at IIM Kozhikode with a shockingly high cutoff. Despite IIMK PGP being at 98, this finance program is 99.99 due to few seats and intense demand. Only target this if finance is your definite path." },
+    { name:"IIM Kozhikode PGP-LSM", req:98.18, tag:"IIM K — Liberal Studies", type:"IIM", varc:70, dilr:70, qa:60, overall:null, info:"Liberal Studies and Management at IIMK. Interdisciplinary program combining management with liberal arts. Lower QA cutoff (60) makes it more accessible if quants is weak. Unique learning experience." },
+    { name:"IIM Mumbai MBA-OSCM", req:97.0, tag:"IIM Mumbai — Ops & Supply Chain", type:"IIM", varc:80, dilr:95, qa:95, overall:97, info:"Formerly NITIE, now IIM Mumbai. Extremely high DILR and QA cutoffs of 95 each. Essentially an engineering-only program. Deep operations focus — great for manufacturing, supply chain, logistics careers." },
+    { name:"IIM Mumbai MBA-SM", req:96.0, tag:"IIM Mumbai — Strategy", type:"IIM", varc:80, dilr:94, qa:95, overall:96, info:"Strategic Management at IIM Mumbai. Very high sectional cutoffs (DILR 94, QA 95). Niche program for consulting-focused candidates. Former NITIE brand in operations is strong." },
+    { name:"IIM Ahmedabad FABM", req:79.34, tag:"IIM A — Agri Business (Agri bg only)", type:"IIM", varc:null, dilr:null, qa:null, overall:null, info:"Food and Agribusiness Management at IIM Ahmedabad. An IIM A program at 79 percentile! BUT it is exclusively for candidates from agricultural backgrounds — farmer families, agri graduates, agri work experience." },
+    { name:"IIM Shillong — PGPEX", req:85.0, tag:"IIM Shillong — 1yr Executive", type:"IIM", varc:null, dilr:null, qa:null, overall:null, info:"1-year executive MBA at IIM Shillong for working professionals with 5+ years experience. IIM brand with shorter duration." },
+
+    // NEW IIMs
+    { name:"IIM Rohtak (PGP)", req:83.0, tag:"IIM — New Gen", type:"New IIM", varc:null, dilr:null, qa:null, overall:83, info:"Engineering Male is the most over-represented category here — if you're an engineer male you need much higher. For non-engineers or female candidates the 83 is more achievable." },
+    { name:"IIM Raipur (PGP)", req:85.0, tag:"IIM — New Gen · Est. 2010", type:"New IIM", varc:60, dilr:60, qa:60, overall:75, info:"Located in Chhattisgarh. One of the better new IIMs in terms of placements and faculty. Has a growing focus on rural management and social impact." },
+    { name:"IIM Ranchi (PGP)", req:85.0, tag:"IIM — New Gen · Est. 2010", type:"New IIM", varc:60, dilr:60, qa:60, overall:75, info:"Located in Jharkhand. Known for its HR specialization — one of the stronger new IIMs for HR profiles. Also has a 1-year executive MBA." },
+    { name:"IIM Kashipur (PGP)", req:84.0, tag:"IIM — New Gen · Est. 2011", type:"New IIM", varc:55, dilr:55, qa:55, overall:75, info:"Located in Uttarakhand. One of the better-placed new IIMs geographically close to Delhi-NCR. Growing industry connections." },
+    { name:"IIM Trichy (PGP)", req:86.0, tag:"IIM — New Gen · Est. 2011", type:"New IIM", varc:60, dilr:60, qa:60, overall:75, info:"NIT campus in Tamil Nadu. One of the more established new IIMs with decent placements, especially in South India." },
+    { name:"IIM Udaipur (PGP)", req:84.0, tag:"IIM — New Gen · Est. 2011", type:"New IIM", varc:55, dilr:55, qa:55, overall:75, info:"Located in Udaipur. Has a strong focus on global exposure and sustainability. Growing brand value in Rajasthan." },
+    { name:"IIM Nagpur (PGP)", req:83.0, tag:"IIM — New Gen · Est. 2015", type:"New IIM", varc:55, dilr:55, qa:55, overall:70, info:"One of the newer IIMs, located in central India. Still establishing its identity and infrastructure. Consider it if you are in the 80-85 range and want an IIM tag." },
+    { name:"IIM Sirmaur (PGP)", req:80.0, tag:"IIM — New Gen · Est. 2015", type:"New IIM", varc:50, dilr:50, qa:50, overall:65, info:"Located in Himachal Pradesh. One of the newest IIMs. Very limited data on placements. Only consider if you're in the 78-82 range." },
+    { name:"IIM Bodh Gaya (PGP)", req:80.0, tag:"IIM — New Gen · Est. 2015", type:"New IIM", varc:50, dilr:50, qa:50, overall:65, info:"Located in Bihar. Very new IIM, placements are in early stages. IIM tag is the primary draw. Suitable only if you are in the 78-82 range." },
+    { name:"IIM Jammu (PGP)", req:80.0, tag:"IIM — New Gen · Est. 2016", type:"New IIM", varc:50, dilr:50, qa:50, overall:65, info:"Located in Jammu. Newer IIM with developing infrastructure. Best considered as a last resort in the 78-82 range." },
+    { name:"IIM Sambalpur (PGP)", req:75.0, tag:"IIM — New Gen (First year data)", type:"New IIM", varc:55, dilr:55, qa:55, overall:75, info:"One of the newest IIMs with no reliable historical data. The 75 cutoff is an estimate. Only consider if you're at 73-78 with no better options." },
+    { name:"IIM Visakhapatnam (PGP)", req:98.43, tag:"IIM — New Gen (Growing Fast)", type:"New IIM", varc:63, dilr:63, qa:63, overall:72, info:"Relatively low sectional cutoffs at 63 make it accessible for uneven profiles. Worth targeting if your overall is high. Growing industry connections in Andhra Pradesh." },
+    { name:"IIM Amritsar (PGP)", req:91.97, tag:"IIM — New Gen · Est. 2015", type:"New IIM", varc:60, dilr:60, qa:65, overall:80, info:"New IIM in Amritsar with reasonable cutoffs. Growing campus and faculty. Placements improving year by year. Good option for 90-93 scorers wanting the IIM tag." },
+    { name:"CAP Process (8 Baby IIMs)", req:81.0, tag:"New IIMs — Common Admission", type:"New IIM", varc:52, dilr:52, qa:52, overall:81, info:"One application covers multiple newer IIMs — Amritsar, Bodh Gaya, Jammu, Kashipur, Raipur, Ranchi, Sambalpur, Trichy, Udaipur, Vishakhapatnam. Use as your safety net. Trichy, Ranchi, and Kashipur are generally the better picks." },
+
+    // IIT B-SCHOOLS
+    { name:"SJMSoM, IIT Bombay", req:98.12, tag:"IIT B-School — Mumbai", type:"IIT", varc:null, dilr:null, qa:null, overall:null, info:"Shailesh J. Mehta School of Management at IIT Bombay. Located in Mumbai — massive advantage in finance and tech placements. Strongly prefers engineers. IIT Bombay alumni network is one of the strongest in India." },
+    { name:"DMS, IIT Delhi", req:98.73, tag:"IIT B-School — Delhi", type:"IIT", varc:null, dilr:null, qa:null, overall:null, info:"Department of Management Studies at IIT Delhi. Proximity to Delhi's corporate hub is a huge advantage. Excellent for consulting and finance. Prefers engineers but non-engineers have made it." },
+    { name:"DMS, IIT Delhi (Telecom)", req:99.03, tag:"IIT Delhi — Telecom MBA", type:"IIT", varc:null, dilr:null, qa:null, overall:null, info:"Specialised MBA in Telecom Management. For candidates with tech/telecom background. Growing relevance with 5G and digital infrastructure." },
+    { name:"DoMS, IIT Madras", req:97.64, tag:"IIT B-School — Chennai", type:"IIT", varc:null, dilr:null, qa:null, overall:null, info:"One of the best IIT B-schools in South India. Strong in operations, analytics, and tech management. Growing placements in South India's tech ecosystem." },
+    { name:"VGSoM, IIT Kharagpur", req:100.0, tag:"IIT B-School (Non-Eng check criteria)", type:"IIT", varc:null, dilr:null, qa:null, overall:81, info:"The 100 shown is for general engineers — extremely competitive. Non-engineers have different criteria and the overall minimum at 81 is more accessible. IIT Kharagpur has a massive alumni network." },
+    { name:"DoMS, IIT Kanpur", req:92.0, tag:"IIT B-School (Maths in Class 12 needed)", type:"IIT", varc:null, dilr:null, qa:null, overall:92, info:"CRITICAL: You must have had Mathematics in Class 12. Non-maths students are ineligible regardless of percentile. Strong quant culture. Good placements in analytics and consulting." },
+    { name:"DoMS, IIT Roorkee", req:94.0, tag:"IIT B-School — Roorkee", type:"IIT", varc:null, dilr:null, qa:null, overall:94, info:"One of Asia's oldest engineering institutions. DMS at IIT Roorkee has solid placements in operations, consulting, and finance. Good choice for engineers in the 92-95 range." },
+    { name:"SOM, IIT Hyderabad", req:90.0, tag:"IIT B-School — Hyderabad", type:"IIT", varc:null, dilr:null, qa:null, overall:85, info:"School of Management at IIT Hyderabad. Growing rapidly given Hyderabad's tech ecosystem. Good for candidates targeting the tech-management intersection." },
+    { name:"SOM, NIT Trichy", req:88.0, tag:"NIT B-School — South India", type:"IIT", varc:null, dilr:null, qa:null, overall:80, info:"School of Management at NIT Trichy — one of the top NITs. Strong technical culture. Placements in South India's manufacturing and tech sector." },
+    { name:"IISc Bangalore MMgmt", req:95.23, tag:"Research Institute — Engineers Only", type:"Other", varc:null, dilr:null, qa:null, overall:95.23, info:"Master of Management at Indian Institute of Science. Exclusively for engineers. IISc is world-renowned for research. Research-heavy culture with exceptional global brand." },
+
+    // DU / DSE
+    { name:"FMS Delhi", req:97.28, tag:"Delhi University — Premier B-School", type:"DU", varc:null, dilr:null, qa:null, overall:null, info:"Faculty of Management Studies is a legendary institution. The fees are extraordinarily low (~₹10,000/year) making ROI exceptional. GD+PI+WAT is critical. Work experience matters." },
+    { name:"DSE MBA-IB (Final Admission)", req:89.59, tag:"Delhi School of Economics — Intl Business", type:"DU", varc:null, dilr:null, qa:null, overall:82.31, info:"Delhi School of Economics MBA in International Business. Very low fees, excellent faculty. The 82.31 is the shortlist cutoff, 89.59 is final admission. Underrated gem." },
+    { name:"DSE MBA-HRD (Final Admission)", req:93.96, tag:"Delhi School of Economics — HR", type:"DU", varc:null, dilr:null, qa:null, overall:89.24, info:"DSE MBA in Human Resource Development. Faculty quality is exceptional. Low fees with strong Delhi University brand. Work experience is valued. Specializes in HR and organizational behavior." },
+    { name:"DSE MBA-BA (Final Admission)", req:92.37, tag:"Delhi School of Economics — Analytics", type:"DU", varc:null, dilr:null, qa:null, overall:86.47, info:"DSE MBA in Business Analytics. Combines DSE's academic rigor with data science focus. Good for quant-savvy candidates who want a non-IIM environment." },
+    { name:"DBE (Can be bit off)", req:94.23, tag:"Dept. of Business Economics — DU South", type:"DU", varc:null, dilr:null, qa:null, overall:null, info:"Department of Business Economics, University of Delhi South Campus. One of the most underrated finance programs in India. Strong in financial economics, derivatives, capital markets." },
+    { name:"DFS (Can be bit off)", req:95.75, tag:"Dept. of Financial Studies — DU South", type:"DU", varc:null, dilr:null, qa:null, overall:null, info:"Department of Financial Studies, University of Delhi South Campus. Pure finance specialization. Very strong alumni in mutual funds, banking, and financial markets." },
+
+    // OTHER
+    { name:"IIFT International Business", req:87.16, tag:"IIFT — Separate Exam", type:"Other", varc:50, dilr:50, qa:50, overall:null, info:"Indian Institute of Foreign Trade. NOTE: IIFT conducts its own separate entrance exam — not CAT. This cutoff is approximate/equivalent. Specialises in international trade, exports, global business." },
+    { name:"IIFT Business Analytics", req:87.16, tag:"IIFT — Analytics Program", type:"Other", varc:50, dilr:50, qa:50, overall:null, info:"Newer program at IIFT focused on business analytics. Same cutoff as IB program. IIFT brand applies. Good for data-driven candidates who want international business exposure." },
+    { name:"NITIE Mumbai (now IIM Mumbai)", req:95.0, tag:"Now renamed IIM Mumbai", type:"IIT", varc:null, dilr:null, qa:null, overall:90, info:"NITIE has been officially renamed IIM Mumbai as of 2022. Its legacy in operations and supply chain management remains strong." },
+    { name:"XLRI Jamshedpur — BM", req:95.0, tag:"XLRI — Business Management", type:"Other", varc:null, dilr:null, qa:null, overall:null, info:"XLRI does not use CAT — it uses XAT. One of the most prestigious non-IIM B-schools in India. Business Management program is extremely strong especially in HR and general management." },
+    { name:"XLRI Jamshedpur — HRM", req:90.0, tag:"XLRI — Human Resources", type:"Other", varc:null, dilr:null, qa:null, overall:null, info:"XLRI's flagship HR program — the best HR MBA in India by most accounts. Uses XAT not CAT. Legendary alumni network in HR." },
+    { name:"SPJIMR Mumbai", req:94.0, tag:"S.P. Jain — Top Pvt B-School", type:"Other", varc:null, dilr:null, qa:null, overall:null, info:"S.P. Jain Institute of Management and Research in Mumbai. Top private B-school with excellent placements, especially in finance and consulting. Accepts CAT/XAT/GMAT scores." },
+    { name:"MDI Gurgaon", req:94.0, tag:"MDI — NCR Region", type:"Other", varc:null, dilr:null, qa:null, overall:null, info:"Management Development Institute in Gurgaon. Accepts CAT scores. Top private B-school with excellent placements given its proximity to Gurgaon's corporate hub. Almost IIM-level in terms of placements." },
+    { name:"IMT Ghaziabad", req:90.0, tag:"Top Pvt B-School — NCR", type:"Other", varc:null, dilr:null, qa:null, overall:null, info:"Institute of Management Technology. Accepts CAT/XAT/GMAT. Good for marketing and finance profiles. Solid return with lower fees. Good backup option in the 88-93 range." },
+    { name:"TISS Mumbai — HRM & LR", req:93.0, tag:"TISS — Social Sciences", type:"Other", varc:null, dilr:null, qa:null, overall:null, info:"Tata Institute of Social Sciences uses its own TISSMAT exam. Best HR/Labour Relations program from a social science perspective. Very different culture from IIMs — research-oriented, socially conscious." },
+  ];
+
+  function getZone(req, pct) {
+    const gap = pct - req;
+    if (gap >= 2)  return 'safe';
+    if (gap >= 0)  return 'target';
+    if (gap >= -6) return 'stretch';
+    return 'out';
+  }
+
+  const zoneLabels = {
+    safe:    'Comfortably above cutoff',
+    target:  'At cutoff — borderline',
+    stretch: 'Below cutoff — stretch',
+    out:     'Out of reach'
+  };
+
+  let userPct    = 85;
+  let activeType = 'all';
+  let searchQ    = '';
+
+  function typePillClass(t) {
+    if (t === 'IIM')     return 'type-pill-IIM';
+    if (t === 'New IIM') return 'type-pill-NewIIM';
+    if (t === 'IIT')     return 'type-pill-IIT';
+    if (t === 'DU')      return 'type-pill-DU';
+    return 'type-pill-Other';
+  }
+
+  function render() {
+    const list = document.getElementById('collegeList');
+    const counts = { safe: 0, target: 0, stretch: 0, out: 0 };
+    colleges.forEach(c => counts[getZone(c.req, userPct)]++);
+
+    document.getElementById('cnt-safe').textContent    = counts.safe;
+    document.getElementById('cnt-target').textContent  = counts.target;
+    document.getElementById('cnt-stretch').textContent = counts.stretch;
+    document.getElementById('cnt-out').textContent     = counts.out;
+
+    const filtered = colleges.filter(c => {
+      if (activeType !== 'all' && c.type !== activeType) return false;
+      if (searchQ && !c.name.toLowerCase().includes(searchQ) && !c.tag.toLowerCase().includes(searchQ)) return false;
+      return true;
+    });
+
+    if (filtered.length === 0) {
+      list.innerHTML = '<div class="no-results">No colleges match your filters.</div>';
+      return;
+    }
+
+    const grouped = { safe: [], target: [], stretch: [], out: [] };
+    filtered.forEach(c => grouped[getZone(c.req, userPct)].push(c));
+
+    let html = '';
+    ['safe', 'target', 'stretch', 'out'].forEach(z => {
+      if (grouped[z].length === 0) return;
+      html += `
+        <div class="zone-header">
+          <span class="zone-pill ${z}">${zoneLabels[z]}</span>
+          <div class="zone-divider"></div>
+          <span class="zone-count">${grouped[z].length} college${grouped[z].length !== 1 ? 's' : ''}</span>
+        </div>`;
+
+      grouped[z].forEach(c => {
+        const gap    = (userPct - c.req).toFixed(1);
+        const gapNum = parseFloat(gap);
+        const gapStr = gapNum >= 2  ? `+${gap} · comfortable buffer` :
+                       gapNum >= 0  ? `+${gap} · right at cutoff, risky` :
+                                      `${Math.abs(gap)} more needed`;
+        const gapCls = gapNum >= 0 ? 'gap-pos' : 'gap-neg';
+        const pc     = typePillClass(c.type);
+        const secStr = (c.varc !== null && c.varc !== undefined)
+          ? `VARC: ${c.varc} | DILR: ${c.dilr} | QA: ${c.qa}`
+          : 'No fixed sectional cutoffs';
+        const overStr = (c.overall !== null && c.overall !== undefined) ? c.overall : '—';
+
+        html += `
+          <div class="college-card" onclick="this.classList.toggle('expanded')">
+            <div class="cc-header">
+              <div class="pct-badge ${z}">${c.req}</div>
+              <div class="cc-info">
+                <div class="cc-name">${c.name}</div>
+                <div class="cc-meta">
+                  <span class="type-pill ${pc}">${c.type}</span>
+                  <span class="gap-text ${gapCls}">${gapStr}</span>
+                </div>
+              </div>
+              <span class="cc-chev">▼</span>
+            </div>
+            <div class="cc-detail">
+              <div class="cc-detail-text">${c.tag}<br><br>${c.info}</div>
+              <div class="cc-chips">
+                <span class="cc-chip">Sections: <span>${secStr}</span></span>
+                <span class="cc-chip">Min overall: <span>${overStr}</span></span>
+              </div>
+            </div>
+          </div>`;
+      });
+    });
+
+    list.innerHTML = html;
+  }
+
+  function setType(t, btn) {
+    activeType = t;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    render();
+  }
+
+  function onSearch(val) {
+    searchQ = val.toLowerCase().trim();
+    render();
+  }
+
+  document.getElementById('pctSlider').addEventListener('input', function() {
+    userPct = parseFloat(this.value);
+    document.getElementById('pctVal').textContent = userPct.toFixed(1);
+    render();
+  });
+
+  render();
+</script>
+</body>
+</html>

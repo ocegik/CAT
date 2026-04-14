@@ -4,57 +4,138 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>CAT Prep — Dashboard</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <style>
+    /* ── HERO ── */
     .hero { text-align: center; margin-bottom: 36px; }
-    .hero-eyebrow { font-family:"Inter",sans-serif; font-size:11px; font-weight:500; letter-spacing:3px; text-transform:uppercase; color:var(--text4); margin-bottom:10px; }
-    .hero-date { font-family:"Space Mono",monospace; font-size:13px; font-weight:400; color:var(--text3); letter-spacing:2px; margin-bottom:36px; }
-    .block { background:rgba(255,255,255,0.04); border:1px solid var(--border); border-radius:var(--radius); padding:28px 12px 20px; text-align:center; }
-    .block-num { font-family:"Space Mono",monospace; font-weight:700; font-size:64px; line-height:1; display:block; margin-bottom:10px; }
-    .block-lbl { font-family:"Inter",sans-serif; font-size:11px; font-weight:500; letter-spacing:3px; color:rgba(255,255,255,0.28); text-transform:uppercase; }
-    #b-days  .block-num { color:var(--red); }
-    #b-hours .block-num { color:var(--orange); }
-    #b-mins  .block-num { color:var(--amber); }
-    #b-secs  .block-num { color:rgba(255,255,255,0.55); }
-    .datepicker-row { display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:36px; }
-    .datepicker-row label { font-family:"Inter",sans-serif; font-size:12px; font-weight:500; letter-spacing:1.5px; color:var(--text3); text-transform:uppercase; }
-    #exam-date { background:rgba(255,255,255,0.07); border:1px solid var(--border2); border-radius:8px; padding:7px 14px; color:rgba(255,255,255,0.8); font-family:"Space Mono",monospace; font-size:14px; outline:none; color-scheme:dark; }
-    .stat-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px 12px; margin-top:6px; }
+    .hero-eyebrow {
+      font-family: "Inter", sans-serif;
+      font-size: 11px; font-weight: 500;
+      letter-spacing: 3px; text-transform: uppercase;
+      color: var(--text4); margin-bottom: 10px;
+    }
+    .hero-date {
+      font-family: "Space Mono", monospace;
+      font-size: 13px; font-weight: 400;
+      color: var(--text3); letter-spacing: 2px;
+      margin-bottom: 36px;
+    }
+
+    /* Countdown blocks */
+    .block {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 12px 20px;
+      text-align: center;
+    }
+    .block-num {
+      font-family: "Space Mono", monospace;
+      font-weight: 700; font-size: 64px;
+      line-height: 1; display: block; margin-bottom: 10px;
+    }
+    .block-lbl {
+      font-family: "Inter", sans-serif;
+      font-size: 11px; font-weight: 500;
+      letter-spacing: 3px; color: rgba(255,255,255,0.28);
+      text-transform: uppercase;
+    }
+    #b-days  .block-num { color: var(--red); }
+    #b-hours .block-num { color: var(--orange); }
+    #b-mins  .block-num { color: var(--amber); }
+    #b-secs  .block-num { color: rgba(255,255,255,0.55); }
+
+    /* Date picker */
+    .datepicker-row {
+      display: flex; align-items: center;
+      justify-content: center; gap: 12px;
+      margin-bottom: 36px;
+    }
+    .datepicker-row label {
+      font-family: "Inter", sans-serif;
+      font-size: 12px; font-weight: 500;
+      letter-spacing: 1.5px; color: var(--text3);
+      text-transform: uppercase;
+    }
+    #exam-date {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid var(--border2);
+      border-radius: 8px; padding: 7px 14px;
+      color: rgba(255,255,255,0.8);
+      font-family: "Space Mono", monospace;
+      font-size: 14px; outline: none; color-scheme: dark;
+    }
+
+    /* Stat grid inside cards */
+    .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px 12px; margin-top: 6px; }
     .stat-val  { font-family:"Space Mono",monospace; font-size:32px; font-weight:700; color:#fff; display:block; line-height:1; margin-bottom:5px; }
     .stat-lbl  { font-family:"Inter",sans-serif; font-size:13px; font-weight:500; color:var(--text3); display:block; }
-    .prog-row { margin-bottom:18px; }
-    .prog-row:last-child { margin-bottom:0; }
+
+    /* Prog rows */
+    .prog-row { margin-bottom: 18px; }
+    .prog-row:last-child { margin-bottom: 0; }
     .prog-header { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px; }
-    .prog-title { font-family:"Inter",sans-serif; font-size:13px; font-weight:500; color:var(--text3); }
-    .prog-val   { font-family:"Space Mono",monospace; font-size:15px; font-weight:700; color:rgba(255,255,255,0.7); }
+    .prog-title  { font-family:"Inter",sans-serif; font-size:13px; font-weight:500; color:var(--text3); }
+    .prog-val    { font-family:"Space Mono",monospace; font-size:15px; font-weight:700; color:rgba(255,255,255,0.7); }
+
+    /* Urgency card */
     #urgency-card .card-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
     #urgency-bar-wrap { height:12px; background:rgba(255,255,255,0.07); border-radius:6px; overflow:hidden; margin-bottom:10px; }
-    #urgency-fill { height:100%; border-radius:6px; transition:width 1s ease, background 1s ease; }
-    #urgency-text { font-family:"Space Mono",monospace; font-size:15px; font-weight:700; }
-    #urgency-label { font-family:"Inter",sans-serif; font-size:12px; font-weight:500; color:var(--text4); margin-top:4px; }
-    #msg-card { background:rgba(255,255,255,0.04); border:1px solid var(--border); border-left:3px solid rgba(224,85,85,0.6); border-radius:var(--radius); border-top-left-radius:4px; border-bottom-left-radius:4px; padding:22px 24px; margin-bottom:14px; }
-    #msg-text { font-family:"Inter",sans-serif; font-size:15px; font-weight:400; font-style:italic; color:rgba(255,255,255,0.6); line-height:1.7; }
+    #urgency-fill     { height:100%; border-radius:6px; transition: width 1s ease, background 1s ease; }
+    #urgency-text     { font-family:"Space Mono",monospace; font-size:15px; font-weight:700; }
+    #urgency-label    { font-family:"Inter",sans-serif; font-size:12px; font-weight:500; color:var(--text4); margin-top:4px; }
+
+    /* Message card */
+    #msg-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-left: 3px solid rgba(224,85,85,0.6);
+      border-radius: var(--radius);
+      border-top-left-radius: 4px; border-bottom-left-radius: 4px;
+      padding: 22px 24px; margin-bottom: 14px;
+    }
+    #msg-text {
+      font-family:"Inter",sans-serif; font-size:15px;
+      font-weight:400; font-style:italic;
+      color:rgba(255,255,255,0.6); line-height:1.7;
+    }
+
+    /* Mini cards */
     .mini-val { font-family:"Space Mono",monospace; font-size:34px; font-weight:700; color:#fff; display:block; margin-bottom:6px; line-height:1; }
     .mini-lbl { font-family:"Inter",sans-serif; font-size:12px; font-weight:500; letter-spacing:1.5px; color:var(--text3); text-transform:uppercase; }
+
+    /* Quick links */
     .quick-links { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px; }
-    .quick-link { display:flex; align-items:center; gap:14px; background:rgba(255,255,255,0.04); border:1px solid var(--border); border-radius:var(--radius); padding:20px 22px; text-decoration:none; transition:border-color 0.15s, background 0.15s; }
-    .quick-link:hover { border-color:var(--border2); background:rgba(255,255,255,0.07); }
-    .ql-icon  { font-size:26px; }
+    .quick-link {
+      display:flex; align-items:center; gap:14px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 20px 22px;
+      text-decoration:none; transition: border-color 0.15s, background 0.15s;
+    }
+    .quick-link:hover { border-color: var(--border2); background: rgba(255,255,255,0.07); }
+    .ql-icon { font-size: 26px; }
     .ql-title { font-family:"Syne",sans-serif; font-size:16px; font-weight:700; color:var(--text); margin-bottom:3px; }
     .ql-sub   { font-family:"Inter",sans-serif; font-size:12px; color:var(--text3); }
-    @media (max-width:600px) { .block-num { font-size:42px; } .quick-links { grid-template-columns:1fr; } }
+
+    @media (max-width:600px) {
+      .block-num { font-size: 42px; }
+      .quick-links { grid-template-columns:1fr; }
+    }
   </style>
 </head>
 <body>
+
+<!-- ── NAV ── -->
 <nav class="nav">
-  <a class="nav-brand" href="index.html"><span class="nav-logo">CAT<span>.</span>prep</span></a>
+  <a class="nav-brand" href="index.html">
+    <span class="nav-logo">CAT<span>.</span>prep</span>
+  </a>
   <div class="nav-links">
-    <a href="index.html"   class="nav-link active">Dashboard</a>
-    <a href="tracker.html" class="nav-link">QA Tracker</a>
-    <a href="intel.html"   class="nav-link">Exam Intel</a>
+    <a href="index.html"      class="nav-link active">Dashboard</a>
+    <a href="tracker.html"   class="nav-link">QA Tracker</a>
+    <a href="intel.html"     class="nav-link">Exam Intel</a>
+    <a href="predictor.html" class="nav-link">Call Predictor</a>
   </div>
   <div class="nav-right">
     <span class="nav-pulse"></span>
@@ -62,33 +143,52 @@
   </div>
 </nav>
 
+<!-- ── PAGE ── -->
 <main class="page">
+
+  <!-- Hero countdown -->
   <div class="hero">
     <div class="hero-eyebrow">Days remaining until</div>
     <div class="t1" style="font-size:80px;letter-spacing:-3px;line-height:1;margin-bottom:6px">CAT 2025</div>
     <div class="hero-date" id="display-date">-- --- ----</div>
+
     <div class="grid-4 mb-12" style="margin-bottom:12px">
       <div class="block" id="b-days"><span class="block-num" id="n-days">--</span><span class="block-lbl">Days</span></div>
       <div class="block" id="b-hours"><span class="block-num" id="n-hours">--</span><span class="block-lbl">Hours</span></div>
       <div class="block" id="b-mins"><span class="block-num" id="n-mins">--</span><span class="block-lbl">Mins</span></div>
       <div class="block" id="b-secs"><span class="block-num" id="n-secs">--</span><span class="block-lbl">Secs</span></div>
     </div>
+
     <div class="datepicker-row">
       <label for="exam-date">Exam date</label>
       <input type="date" id="exam-date">
     </div>
   </div>
 
+  <!-- Summary stats + progress -->
   <div class="grid-2 mb-14">
     <div class="card">
       <div class="section-label">Time breakdown</div>
       <div class="stat-grid">
-        <div><span class="stat-val accent-red"   id="s-weeks">--</span><span class="stat-lbl">Weeks left</span></div>
-        <div><span class="stat-val accent-orange" id="s-hours">--</span><span class="stat-lbl">Hours total</span></div>
-        <div><span class="stat-val accent-amber"  id="s-mins-total">--</span><span class="stat-lbl">Minutes total</span></div>
-        <div><span class="stat-val accent-amber"  id="s-weekends">--</span><span class="stat-lbl">Weekends</span></div>
+        <div>
+          <span class="stat-val accent-red"   id="s-weeks">--</span>
+          <span class="stat-lbl">Weeks left</span>
+        </div>
+        <div>
+          <span class="stat-val accent-orange" id="s-hours">--</span>
+          <span class="stat-lbl">Hours total</span>
+        </div>
+        <div>
+          <span class="stat-val accent-amber"  id="s-mins-total">--</span>
+          <span class="stat-lbl">Minutes total</span>
+        </div>
+        <div>
+          <span class="stat-val accent-amber"  id="s-weekends">--</span>
+          <span class="stat-lbl">Weekends</span>
+        </div>
       </div>
     </div>
+
     <div class="card">
       <div class="section-label">Progress</div>
       <div style="margin-top:4px">
@@ -108,33 +208,84 @@
     </div>
   </div>
 
+  <!-- Urgency -->
   <div class="card mb-14" id="urgency-card">
     <div class="card-header">
       <div class="section-label" style="margin-bottom:0">Urgency level</div>
       <span id="urgency-text">Computing...</span>
     </div>
-    <div id="urgency-bar-wrap"><div id="urgency-fill" style="width:0%;background:rgba(255,255,255,.3)"></div></div>
+    <div id="urgency-bar-wrap">
+      <div id="urgency-fill" style="width:0%; background:rgba(255,255,255,.3)"></div>
+    </div>
     <div id="urgency-label">Higher as exam approaches · Red zone = final 30 days</div>
   </div>
 
+  <!-- Today's message -->
   <div id="msg-card">
-    <div class="section-label" style="color:rgba(224,85,85,0.6);margin-bottom:6px">Today's reminder</div>
+    <div class="section-label" style="color:rgba(224,85,85,0.6); margin-bottom:6px">Today's reminder</div>
     <div id="msg-text">Loading...</div>
   </div>
 
+  <!-- Mini cards -->
   <div class="grid-3 mb-14" style="margin:14px 0">
-    <div class="card-sm" style="text-align:center"><span class="mini-val" id="m-study-days">--</span><span class="mini-lbl">Study days left</span></div>
-    <div class="card-sm" style="text-align:center"><span class="mini-val" id="m-mocks">--</span><span class="mini-lbl">Mocks possible</span></div>
-    <div class="card-sm" style="text-align:center"><span class="mini-val" id="m-today">--</span><span class="mini-lbl">Day of year</span></div>
+    <div class="card-sm" style="text-align:center">
+      <span class="mini-val" id="m-study-days">--</span>
+      <span class="mini-lbl">Study days left</span>
+    </div>
+    <div class="card-sm" style="text-align:center">
+      <span class="mini-val" id="m-mocks">--</span>
+      <span class="mini-lbl">Mocks possible</span>
+    </div>
+    <div class="card-sm" style="text-align:center">
+      <span class="mini-val" id="m-today">--</span>
+      <span class="mini-lbl">Day of year</span>
+    </div>
   </div>
 
+  <!-- Quick navigation -->
   <div class="section-label" style="margin-top:28px">Explore</div>
   <div class="quick-links">
-    <a href="tracker.html" class="quick-link"><span class="ql-icon">📋</span><div><div class="ql-title">QA Tracker</div><div class="ql-sub">384 videos · 7 phases · track your progress</div></div></a>
-    <a href="intel.html"   class="quick-link"><span class="ql-icon">🎯</span><div><div class="ql-title">Exam Intelligence</div><div class="ql-sub">Score targets · section breakdown · IIM data</div></div></a>
+    <a href="tracker.html" class="quick-link">
+      <span class="ql-icon">📋</span>
+      <div>
+        <div class="ql-title">QA Tracker</div>
+        <div class="ql-sub">384 videos · 7 phases · track your progress</div>
+      </div>
+    </a>
+    <a href="intel.html" class="quick-link">
+      <span class="ql-icon">🎯</span>
+      <div>
+        <div class="ql-title">Exam Intelligence</div>
+        <div class="ql-sub">Score targets · section breakdown · IIM data</div>
+      </div>
+    </a>
+    <a href="predictor.html" class="quick-link">
+      <span class="ql-icon">🏫</span>
+      <div>
+        <div class="ql-title">Call Predictor</div>
+        <div class="ql-sub">See which colleges fit your target percentile</div>
+      </div>
+    </a>
   </div>
 
-  <div class="ticker-wrap"><span class="ticker-inner">STUDY HARD &nbsp;·&nbsp; STAY FOCUSED &nbsp;·&nbsp; CAT 2025 &nbsp;·&nbsp; EVERY HOUR COUNTS &nbsp;·&nbsp; NO DAYS OFF &nbsp;·&nbsp; IIM AWAITS &nbsp;·&nbsp; PERCENTILE MATTERS &nbsp;·&nbsp; PUT IN THE WORK &nbsp;·&nbsp; MOCK. ANALYSE. REPEAT &nbsp;·&nbsp; TIME IS RUNNING &nbsp;·&nbsp; DILR IS NON-NEGOTIABLE &nbsp;·&nbsp; VARC EVERY SINGLE DAY &nbsp;·&nbsp; QA SPEED IS EARNED &nbsp;·&nbsp; STUDY HARD &nbsp;·&nbsp; STAY FOCUSED &nbsp;·&nbsp; CAT 2025 &nbsp;·&nbsp; EVERY HOUR COUNTS &nbsp;·&nbsp; NO DAYS OFF &nbsp;·&nbsp; IIM AWAITS &nbsp;·&nbsp; PERCENTILE MATTERS &nbsp;·&nbsp; PUT IN THE WORK &nbsp;·&nbsp; MOCK. ANALYSE. REPEAT &nbsp;·&nbsp; TIME IS RUNNING &nbsp;·&nbsp; DILR IS NON-NEGOTIABLE &nbsp;·&nbsp; VARC EVERY SINGLE DAY &nbsp;·&nbsp; QA SPEED IS EARNED &nbsp;·&nbsp;</span></div>
+  <!-- Ticker -->
+  <div class="ticker-wrap">
+    <span class="ticker-inner">
+      STUDY HARD &nbsp;·&nbsp; STAY FOCUSED &nbsp;·&nbsp; CAT 2025
+      &nbsp;·&nbsp; EVERY HOUR COUNTS &nbsp;·&nbsp; NO DAYS OFF &nbsp;·&nbsp;
+      IIM AWAITS &nbsp;·&nbsp; PERCENTILE MATTERS &nbsp;·&nbsp; PUT IN THE WORK
+      &nbsp;·&nbsp; MOCK. ANALYSE. REPEAT &nbsp;·&nbsp; TIME IS RUNNING
+      &nbsp;·&nbsp; DILR IS NON-NEGOTIABLE &nbsp;·&nbsp; VARC EVERY SINGLE DAY
+      &nbsp;·&nbsp; QA SPEED IS EARNED &nbsp;·&nbsp;
+      STUDY HARD &nbsp;·&nbsp; STAY FOCUSED &nbsp;·&nbsp; CAT 2025
+      &nbsp;·&nbsp; EVERY HOUR COUNTS &nbsp;·&nbsp; NO DAYS OFF &nbsp;·&nbsp;
+      IIM AWAITS &nbsp;·&nbsp; PERCENTILE MATTERS &nbsp;·&nbsp; PUT IN THE WORK
+      &nbsp;·&nbsp; MOCK. ANALYSE. REPEAT &nbsp;·&nbsp; TIME IS RUNNING
+      &nbsp;·&nbsp; DILR IS NON-NEGOTIABLE &nbsp;·&nbsp; VARC EVERY SINGLE DAY
+      &nbsp;·&nbsp; QA SPEED IS EARNED &nbsp;·&nbsp;
+    </span>
+  </div>
+
 </main>
 
 <script src="js/countdown.js"></script>
@@ -143,13 +294,18 @@
   let stored = savedDate() || getDefaultDate();
   dateInput.value = stored;
   dateInput.addEventListener("change", () => { saveDate(dateInput.value); countdownTick(dateInput.value); });
+
   setDailyMsg("msg-text");
   countdownTick(dateInput.value);
   setInterval(() => countdownTick(dateInput.value), 1000);
+
+  // Favicon
   (function(){
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="7" fill="#09090e"/><text x="16" y="22" font-family="monospace" font-weight="700" font-size="14" fill="#e05555" text-anchor="middle">CAT</text></svg>`;
-    const link = document.createElement("link"); link.rel="icon"; link.type="image/svg+xml";
-    link.href="data:image/svg+xml,"+encodeURIComponent(svg); document.head.appendChild(link);
+    const link = document.createElement("link");
+    link.rel="icon"; link.type="image/svg+xml";
+    link.href="data:image/svg+xml,"+encodeURIComponent(svg);
+    document.head.appendChild(link);
   })();
 </script>
 </body>
