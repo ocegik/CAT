@@ -422,32 +422,40 @@
   }
 
 
-  function percentileToMarks(pct){
-    const map = [
-      { pct: 99.9, marks: 115 },
-      { pct: 99.5, marks: 100 },
-      { pct: 99.0, marks: 90 },
-      { pct: 98.0, marks: 78 },
-      { pct: 95.0, marks: 62 },
-      { pct: 90.0, marks: 48 },
-      { pct: 85.0, marks: 40 },
-      { pct: 80.0, marks: 34 },
-      { pct: 75.0, marks: 28 },
-      { pct: 70.0, marks: 23 }
-    ];
+  function percentileToMarks(pct) {
+  // Calibrated to be strict, realistic, and on the harder/conservative side.
+  // Benchmarked against tougher scaling years and a 44-mark baseline for ~85 percentile.
+  const map = [
+    { pct: 99.9, marks: 125 },
+    { pct: 99.5, marks: 108 },
+    { pct: 99.0, marks: 98  },
+    { pct: 98.0, marks: 86  },
+    { pct: 95.0, marks: 72  },
+    { pct: 90.0, marks: 56  },
+    { pct: 85.0, marks: 45  }, // Aligned closely with your 44-mark experience + a tiny buffer
+    { pct: 80.0, marks: 39  },
+    { pct: 75.0, marks: 34  },
+    { pct: 70.0, marks: 29  }
+  ];
 
-    for(let i=0;i<map.length-1;i++){
-      const a = map[i];
-      const b = map[i+1];
-
-      if(pct <= a.pct && pct >= b.pct){
-        const ratio = (pct - b.pct)/(a.pct - b.pct);
-        return Math.round(b.marks + ratio*(a.marks - b.marks));
-      }
-    }
-
-    return map[map.length-1].marks;
+  // Edge case: If requested percentile is higher than the max defined in the map
+  if (pct >= map[0].pct) {
+    return map[0].marks;
   }
+
+  for (let i = 0; i < map.length - 1; i++) {
+    const a = map[i];
+    const b = map[i + 1];
+
+    if (pct <= a.pct && pct >= b.pct) {
+      const ratio = (pct - b.pct) / (a.pct - b.pct);
+      return Math.round(b.marks + ratio * (a.marks - b.marks));
+    }
+  }
+
+  // Fallback for anything below the lowest mapped percentile
+  return map[map.length - 1].marks;
+}
 
 
   function render() {
