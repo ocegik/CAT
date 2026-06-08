@@ -85,21 +85,6 @@
     #urgency-text     { font-family:"Space Mono",monospace; font-size:15px; font-weight:700; }
     #urgency-label    { font-family:"Inter",sans-serif; font-size:12px; font-weight:500; color:var(--text4); margin-top:4px; }
 
-    /* Message card */
-    #msg-card {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid var(--border);
-      border-left: 3px solid rgba(224,85,85,0.6);
-      border-radius: var(--radius);
-      border-top-left-radius: 4px; border-bottom-left-radius: 4px;
-      padding: 22px 24px; margin-bottom: 14px;
-    }
-    #msg-text {
-      font-family:"Inter",sans-serif; font-size:15px;
-      font-weight:400; font-style:italic;
-      color:rgba(255,255,255,0.6); line-height:1.7;
-    }
-
     /* Mini cards */
     .mini-val { font-family:"Space Mono",monospace; font-size:34px; font-weight:700; color:#fff; display:block; margin-bottom:6px; line-height:1; }
     .mini-lbl { font-family:"Inter",sans-serif; font-size:12px; font-weight:500; letter-spacing:0.5px; color:var(--text3); text-transform:uppercase; }
@@ -133,8 +118,6 @@
   </a>
   <div class="nav-links">
     <a href="index.html"      class="nav-link active">Dashboard</a>
-    <a href="tracker.html"   class="nav-link">QA Tracker</a>
-    <a href="intel.html"     class="nav-link">Exam Intel</a>
     <a href="predictor.html" class="nav-link">Call Predictor</a>
   </div>
   <div class="nav-right">
@@ -220,12 +203,6 @@
     <div id="urgency-label">Higher as exam approaches · Red zone = final 30 days</div>
   </div>
 
-  <!-- Today's message -->
-  <div id="msg-card">
-    <div class="section-label" style="color:rgba(224,85,85,0.6); margin-bottom:6px">Today's reminder</div>
-    <div id="msg-text">Loading...</div>
-  </div>
-
   <!-- Mini cards -->
   <div class="grid-3 mb-14" style="margin:14px 0">
     <div class="card-sm" style="text-align:center">
@@ -245,20 +222,6 @@
   <!-- Quick navigation -->
   <div class="section-label" style="margin-top:28px">Explore</div>
   <div class="quick-links">
-    <a href="tracker.html" class="quick-link">
-      <span class="ql-icon">📋</span>
-      <div>
-        <div class="ql-title">QA Tracker</div>
-        <div class="ql-sub">384 videos · 7 phases · track your progress</div>
-      </div>
-    </a>
-    <a href="intel.html" class="quick-link">
-      <span class="ql-icon">🎯</span>
-      <div>
-        <div class="ql-title">Exam Intelligence</div>
-        <div class="ql-sub">Score targets · section breakdown · IIM data</div>
-      </div>
-    </a>
     <a href="predictor.html" class="quick-link">
       <span class="ql-icon">🏫</span>
       <div>
@@ -295,7 +258,6 @@
   dateInput.value = stored;
   dateInput.addEventListener("change", () => { saveDate(dateInput.value); countdownTick(dateInput.value); });
 
-  setDailyMsg("msg-text");
   countdownTick(dateInput.value);
   setInterval(() => countdownTick(dateInput.value), 1000);
 
