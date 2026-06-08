@@ -59,6 +59,16 @@
       text-align: right;
     }
 
+
+    .pct-marks{
+      font-size:13px;
+      color:var(--text3);
+      text-align:right;
+      margin-top:4px;
+      min-width:80px;
+    }
+
+
     /* ── WARNING BANNER ── */
     .warn-banner {
       font-size: 12px; color: var(--amber);
@@ -249,8 +259,6 @@
   </a>
   <div class="nav-links">
     <a href="index.html"      class="nav-link">Dashboard</a>
-    <a href="tracker.html"   class="nav-link">QA Tracker</a>
-    <a href="intel.html"     class="nav-link">Exam Intel</a>
     <a href="predictor.html" class="nav-link active">Call Predictor</a>
   </div>
   <div class="nav-right">
@@ -272,7 +280,7 @@
     <div class="pct-slider-wrap">
       <input type="range" min="70" max="100" step="0.5" value="85" id="pctSlider">
     </div>
-    <span class="pct-big" id="pctVal">85.0</span>
+    <div><span class="pct-big" id="pctVal">85.0</span><div class="pct-marks" id="marksVal">~40 marks</div></div>
   </div>
 
   <!-- Warning -->
@@ -413,6 +421,35 @@
     return 'type-pill-Other';
   }
 
+
+  function percentileToMarks(pct){
+    const map = [
+      { pct: 99.9, marks: 115 },
+      { pct: 99.5, marks: 100 },
+      { pct: 99.0, marks: 90 },
+      { pct: 98.0, marks: 78 },
+      { pct: 95.0, marks: 62 },
+      { pct: 90.0, marks: 48 },
+      { pct: 85.0, marks: 40 },
+      { pct: 80.0, marks: 34 },
+      { pct: 75.0, marks: 28 },
+      { pct: 70.0, marks: 23 }
+    ];
+
+    for(let i=0;i<map.length-1;i++){
+      const a = map[i];
+      const b = map[i+1];
+
+      if(pct <= a.pct && pct >= b.pct){
+        const ratio = (pct - b.pct)/(a.pct - b.pct);
+        return Math.round(b.marks + ratio*(a.marks - b.marks));
+      }
+    }
+
+    return map[map.length-1].marks;
+  }
+
+
   function render() {
     const list = document.getElementById('collegeList');
     const counts = { safe: 0, target: 0, stretch: 0, out: 0 };
@@ -504,8 +541,11 @@
   document.getElementById('pctSlider').addEventListener('input', function() {
     userPct = parseFloat(this.value);
     document.getElementById('pctVal').textContent = userPct.toFixed(1);
+    document.getElementById('marksVal').textContent = `~${percentileToMarks(userPct)} marks`;
     render();
   });
+
+  document.getElementById('marksVal').textContent = `~${percentileToMarks(userPct)} marks`;
 
   render();
 </script>
