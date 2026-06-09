@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CAT 2026 — June & July Mission</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --ink: #111;
+    --ink2: #333;
+    --ink3: #555;
+    --ink4: #888;
+    --rule: #ccc;
+    --rule2: #e0e0e0;
+    --page: #fff;
+  }
+
+  body {
+    font-family: 'IBM Plex Sans', sans-serif;
+    background: #ddd;
+    color: var(--ink);
+    font-size: 8.5pt;
+    line-height: 1.4;
+  }
+
+  .page {
+    width: 210mm;
+    min-height: 297mm;
+    background: var(--page);
+    margin: 10mm auto;
+    padding: 10mm 11mm 10mm 11mm;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 3mm;
+    margin-bottom: 3.5mm;
+  }
+  .header-left h1 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 15pt;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+  }
+  .header-left p {
+    font-size: 7.5pt;
+    color: var(--ink3);
+    margin-top: 1px;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .header-right {
+    text-align: right;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 7pt;
+    color: var(--ink3);
+    line-height: 1.6;
+  }
+  .countdown {
+    font-size: 10pt;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  /* ── DAILY TASKS BAR ── */
+  .daily-bar {
+    border: 1px solid var(--ink);
+    border-top: 2px solid var(--ink);
+    padding: 2mm 3.5mm;
+    margin-bottom: 3.5mm;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    background: #f9f9f9;
+  }
+  .daily-bar-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 6pt;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--ink3);
+    margin-right: 4px;
+    flex-shrink: 0;
+  }
+  .daily-task {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 7.5pt;
+  }
+  .task-box {
+    width: 9px;
+    height: 9px;
+    border: 1px solid var(--ink);
+    display: inline-block;
+    flex-shrink: 0;
+  }
+
+  /* ── WEEKS GRID ── */
+  .weeks-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3mm;
+    margin-bottom: 3.5mm;
+  }
+
+  .week-card {
+    border: 1px solid var(--ink);
+    padding: 2.5mm 3mm;
+    break-inside: avoid;
+  }
+  .week-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 1.5mm;
+    margin-bottom: 1.5mm;
+  }
+  .week-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9pt;
+    font-weight: 600;
+  }
+  .week-dates {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 6.5pt;
+    color: var(--ink3);
+  }
+  .week-topics {
+    font-size: 6.5pt;
+    color: var(--ink3);
+    margin-bottom: 2mm;
+    line-height: 1.5;
+    border-left: 2px solid var(--ink);
+    padding-left: 3px;
+  }
+  .week-topics span { font-weight: 600; color: var(--ink2); }
+
+  .subject-block { margin-bottom: 1.5mm; }
+  .subject-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 6pt;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--ink3);
+    margin-bottom: 0.8mm;
+    border-bottom: 0.5px solid var(--rule2);
+    padding-bottom: 0.3mm;
+  }
+  .checklist { list-style: none; }
+  .checklist li {
+    display: flex;
+    gap: 4px;
+    font-size: 7pt;
+    margin-bottom: 1.5px;
+    line-height: 1.32;
+    align-items: flex-start;
+  }
+  .checklist li .cb {
+    width: 7px;
+    height: 7px;
+    border: 0.75px solid var(--ink2);
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: inline-block;
+  }
+  .cb-bold { border-width: 1.5px !important; }
+
+  .week-mocks {
+    margin-top: 1.5mm;
+    padding: 1.5mm 2mm;
+    background: #f4f4f4;
+    border-left: 2px solid var(--ink);
+  }
+  .week-mocks-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 5.5pt;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--ink3);
+    margin-bottom: 1mm;
+  }
+  .mock-row {
+    font-size: 6.5pt;
+    display: flex;
+    gap: 3px;
+    align-items: baseline;
+    margin-bottom: 1px;
+  }
+  .mock-date {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 600;
+    font-size: 6.5pt;
+    background: var(--ink);
+    color: #fff;
+    padding: 0 2px;
+    flex-shrink: 0;
+  }
+  .mock-note { font-size: 6pt; color: var(--ink3); }
+
+  .week-sunday {
+    margin-top: 1.5mm;
+    border-top: 0.5px dashed var(--rule);
+    padding-top: 1.5mm;
+  }
+  .sunday-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 6pt;
+    font-weight: 600;
+    color: var(--ink3);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.8mm;
+  }
+  .sunday-items {
+    font-size: 6.5pt;
+    color: var(--ink2);
+    line-height: 1.5;
+  }
+
+  .week-checkin {
+    margin-top: 2mm;
+    border-top: 1px solid var(--ink);
+    padding-top: 1.5mm;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+  .checkin-option {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    font-size: 6.5pt;
+  }
+  .checkin-sq {
+    width: 8px;
+    height: 8px;
+    border: 1px solid var(--ink);
+    display: inline-block;
+  }
+  .notes-label {
+    font-size: 6pt;
+    color: var(--ink4);
+    font-family: 'IBM Plex Mono', monospace;
+    margin-left: 4px;
+    flex-shrink: 0;
+  }
+  .notes-line {
+    border-bottom: 0.5px solid var(--rule);
+    flex: 1;
+    min-width: 20mm;
+    height: 10px;
+  }
+
+  /* ── PHASE BANNER ── */
+  .phase-banner {
+    background: var(--ink);
+    color: #fff;
+    padding: 1.5mm 3mm;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 7pt;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin: 1.5mm 0;
+  }
+
+  /* ── LATER PHASES (compact 4-col) ── */
+  .later-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 2.5mm;
+    margin-top: 2mm;
+  }
+  .later-col {
+    border: 1px solid var(--ink);
+    padding: 2mm 2.5mm;
+    display: flex;
+    flex-direction: column;
+  }
+  .later-col-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 7.5pt;
+    font-weight: 600;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 1mm;
+    margin-bottom: 1.5mm;
+    line-height: 1.3;
+  }
+  .later-item {
+    font-size: 6.5pt;
+    color: var(--ink2);
+    margin-bottom: 1.5px;
+    display: flex;
+    gap: 3px;
+    line-height: 1.35;
+  }
+  .later-item::before {
+    content: '—';
+    color: var(--ink4);
+    flex-shrink: 0;
+  }
+  .target-bar {
+    margin-top: auto;
+    padding-top: 1.5mm;
+    border-top: 0.5px solid var(--rule);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 6pt;
+    color: var(--ink3);
+    line-height: 1.5;
+  }
+  .target-bar strong { color: var(--ink); font-weight: 600; }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 3.5mm;
+    border-top: 1px solid var(--rule);
+    padding-top: 2mm;
+    display: flex;
+    justify-content: space-between;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 6.5pt;
+    color: var(--ink4);
+  }
+  .footer strong { color: var(--ink); font-weight: 600; }
+
+  @media print {
+    body { background: white; }
+    .page { margin: 0; width: 100%; padding: 8mm 10mm; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-left">
+      <h1>CAT 2026 — Jun & Jul Mission</h1>
+      <p>Phase 1: Jun 8 – Jul 15 &nbsp;·&nbsp; Phase 2 begins: Jul 16 &nbsp;·&nbsp; 8 weeks · track daily on your companion sheet</p>
+    </div>
+    <div class="header-right">
+      <div class="countdown">NOV 29, 2026</div>
+      <div>CAT Day</div>
+      <div style="margin-top:2px">ELN · every single day</div>
+    </div>
+  </div>
+
+  <!-- DAILY TASKS BAR -->
+  <div class="daily-bar">
+    <div class="daily-bar-title">Every Day</div>
+    <div class="daily-task"><div class="task-box"></div> 30 min editorial</div>
+    <div class="daily-task"><div class="task-box"></div> 2 RC passages timed</div>
+    <div class="daily-task"><div class="task-box"></div> 25–30 QA problems</div>
+    <div class="daily-task"><div class="task-box"></div> 1 DILR set timed</div>
+    <div class="daily-task"><div class="task-box"></div> ELN update</div>
+  </div>
+
+  <!-- 8 WEEKS -->
+  <div class="weeks-container">
+
+    <!-- WEEK 1 -->
+    <div class="week-card">
+      <div class="week-header">
+        <div class="week-num">Week 1</div>
+        <div class="week-dates">Jun 8 – 14</div>
+      </div>
+      <div class="week-topics"><span>QA:</span> Percentages · P&L &nbsp;|&nbsp; <span>DILR:</span> Tables (2-var, 3-var) &nbsp;|&nbsp; <span>VARC:</span> RC · PJ · PS</div>
+      <div class="subject-block">
+        <div class="subject-label">QA</div>
+        <ul class="checklist">
+          <li><span class="cb"></span>Fractions ↔ %, successive %, reverse %, compound change</li>
+          <li><span class="cb"></span>P&L — cost/marked/selling, discounts, successive discounts</li>
+          <li><span class="cb"></span>25–30 problems/day timed — 2 min max each</li>
+          <li><span class="cb"></span>6–8 formula cards · 15 min mental math warmup daily</li>
+        </ul>
+      </div>
+      <div class="subject-block">
+        <div class="subject-label">DILR</div>
+        <ul class="checklist">
+          <li><span class="cb"></span>1 full 2-var Table set/day — no pausing mid-set</li>
+          <li><span class="cb"></span>2 full 3-var Table sets across the week</li>
+          <li><span class="cb"></span>Log time — target &lt;12 min (2-var), &lt;15 min (3-var) by Fri</li>
+        </ul>
+      </div>
+      <div class="subject-block">
+        <div class="subject-label">VARC</div>
+        <ul class="checklist">
+          <li><span class="cb"></span>2 RC/day, 10–12 min per passage including Qs</li>
+          <li><span class="cb"></span>PJ: 10×3 — Mon/Wed/Fri &nbsp; PS: 8×2 — Tue/Thu</li>
+        </ul>
+      </div>
+      <div class="week-mocks">
+        <div class="week-mocks-title">Mocks</div>
+        <div class="mock-row"><span class="mock-date">Jun 8</span> CDC Launchpad — pure baseline</div>
+        <div class="mock-row"><span class="mock-date">Jun 6–10</span> A Pro — diagnostic only</div>
+      </div>
+      <div class="week-sunday">
+        <div class="sunday-label">Sun Jun 14</div>
+        <div class="sunday-items">Formula card review · Re-solve 3 ELN · P&L without notes? · Plan W2 targets</div>
+      </div>
+      <div class="week-checkin">
+        <div class="checkin-option"><div class="checkin-sq"></div> Crushed</div>
+        <div class="checkin-option"><div class="checkin-sq"></div> Good</div>
+        <div class="checkin-option"><div class="checkin-sq"></div> Struggled</div>
+        <div class="notes-label">Fix:</div><div class="notes-line"></div>
+      </div>
+    </div>
+
+    <!-- WEEK 2 -->
+    <div class="week-card">
+      <div class="week-header">
+        <div class="week-num">Week 2</div>
+        <div class="week-dates">Jun 15 – 21</div>
+      </div>
+      <div class="week-topics"><span>QA:</span> Ratio & Proportion · Mixtures &nbsp;|&nbsp; <span>DILR:</span> Bar Graphs &nbsp;|&nbsp; <span>VARC:</span> RC · PJ · PS</div>
+      <div class="subject-block">
+        <div class="subject-label">QA</div>
+        <ul class="checklist">
+          <li><span class="cb"></span>Ratio & Proportion — part:whole, compound ratios, chains</li>
+          <li><span class="cb"></span>Mixtures & Alligation — 2-component, alligation grid, replacement</li>
+          <li><span class="cb"></span>25–30 problems/day — 5 mixed %+Ratio daily · 6+ new cards</li>
+        </ul>
+      </div>
+      <div class="subject-block">
+        <div class="subject-label">DILR</div>
+        <ul class="checklist">
+          <li><span class="cb"></span>1 Bar Graph set/day — target &lt;10 min for 5-Q set</li>
+          <li><span class="cb"></span>2 back-to-back sessions: 1 Table + 1 Bar Graph in one sitting</li>
+          <li><span class="cb"></span>1 stacked/comparison Bar Graph (2 bars/category)</li>
+        </ul>
+      </div>
+      <div class="subject-block">
+        <div class="subject-label">VARC</div>
+        <ul class="checklist">
+          <li><span class="cb"></span>2 RC/day · PJ: 10×3 (track chain-solve vs guessed) · PS: 8×2</li>
+        </ul>
+      </div>
+      <div class="week-mocks">
+        <div class="week-mocks-title">Mocks</div>
+        <div class="mock-row"><span class="mock-date">Jun 21</span> AIMCAT-SA2701 — 2-week Arithmetic check</div>
+        <div class="mock-row"><span class="mock-date">Jun 20–24</span> A Pro · 3+ hr analysis, classify errors in ELN</div>
+      </div>
+      <div class="week-sunday">
+        <div class="sunday-label">Sun Jun 21</div>
+        <div class="sunday-items">Formula card review W1–W2 · Re-solve 3 ELN · Ratio+Mixtures without notes → 78%+?</div>
+      </div>
+      <div class="week-checkin">
+        <div class="checkin-option"><div class="checkin-sq"></div> Crushed</div>
+        <div class="checkin-option"><div class="checkin-sq"></div> Good</div>
+        <div class="checkin-option"><div class="checkin-sq"></div> Struggled</div>
+        <div class="notes-label">Fix:</div><div class="notes-line"></div>
+      </div>
+    </div>
+
+    <!-- WEEK 3 -->
+    <div class="week-card">
+      <div class="week-header">
+        <div class="week-num">Week 3</div>
+        <div class="week-dates">Jun 22 – 28</div>
+      </div>
+      <div class="week-topics"><span>QA:</span> Time-Speed-Distance &nbsp;|&nbsp; <span>DILR:</span> Line Graphs · Pie Charts &nbsp;|&nbsp; <span>VARC:</span> RC · PJ · PS</div>
+      <div class="subject-block">
+        <div class="subject-label">QA</div>
+        <ul class="checklist">
+          <li><span class="cb"></span>TSD basics — relative speed, trains, boats & streams</li>
+          <li><span class="cb"></span>Avg speed trap — harmonic mean · circular motion meetings</li>
+          <li><span class="cb"></span>25 problems/day — every sub-type across the week</li>
+        </ul>
+      </div>
+      <div class="subject-block">
+        <div class="subject-label">DILR</div>
+        <ul class="checklist">
+          <li><span class="cb"></span>2–3 full Line Graph sets timed</li>
+          <li><span class="cb"></span>2 Pie Chart sets — %→value and value→% traps</li>
+          <li><span class="cb"></span>1 session mixing Line + Pie (simulates exam variety)</li>
+        </ul>
+      </div>
+      <div class="subject-block">
+        <div class="subject-label">VARC</div>
+        <ul class="checklist">
+          <li><span class="cb"></span>2 RC/day — include 2+ philosophy or history passages</li>
+          <li><span class="cb"></span>PJ: 10×3 · PS: 8×2</li>
+        </ul>
+      </div>
+      <div class="week-mocks">
+        <div class="week-mocks-title">Mocks</div>
+        <div class="mock-row"><span class="mock-date">Jun 27</span> C Pro — end-of-June benchmark</div>
+        <div class="mock-row"><span class="mock-date">Jun 27–Jul 1</span> A Pro · TSD in &lt;2 min without notes?</div>
+      </div>
+      <div class="week-sunday">
+        <div class="sunday-label">Sun Jun 28</div>
+        <div class="sunday-items">Full formula stack review · Re-solve 3 ELN · Mocks trending 83–88 overall? · Write one honest line on biggest weakness</div>
+      </div>
+      <div class="week-checkin">
+        <div class="checkin-option"><div class="checkin-sq"></div> Crushed</div>
+        <div class="checkin-option"><div class="checkin-sq"></div> Good</div>
+        <div class="checkin-option"><div class="checkin-sq"></div> Struggled</div>
+        <div class="notes-label">Fix:</div><div class="notes-line"></div>
+      </div>
+    </div>
+
+    <!-- WEEK 4 -->
+    <div class="week-card">
+      <div class="week-header">
+        <div class="week-num">Week 4</div>
+        <div class="week-dates">Jun 29 – Jul 5</div>
+      </div>
+      <div class="week-topics"><span>QA:</span> Time & Work · Pipes &nbsp;|&nbsp; <span>DILR:</span> Caselets · Mixed DI &nbsp;|&nbsp; <span>VARC:</span> RC · PJ · PS</div>
+      <div class="subject-block">
+        <div class="subject-label">QA</div>
+        <ul class="checklist">
+          <li><span class="cb"></span>T&W — efficiency=1/days, combined work, fractional work</li>
+          <li><span class="cb"></span>Pipes & Cisterns — inlet/outlet (same logic as T&W)</li>
+          <li><span class="cb"></span>30 problems/day — T&W is heavily tested, drill for speed</li>
+          <li><span class="cb cb-bold"></span><strong>Arithmetic chain complete: %→P&L→Ratio→Mix→TSD→T&W</strong></li>
+        </ul>
+      </div>
+      <div class="subject-block">
+        <div class="subject-label">DILR</div>
+        <ul class="checklist">
+          <li><span class="cb"></span>2 Caselet sets — build your own table from paragraph</li>
+          <li><span class="cb"></span>Back-to-back mixed DI (Table + Bar/Line) — twice this week</li>
+          <li><span class="cb"></span>Standard 5-Q DI sets consistently under 9 min now</li>
+        </ul>
+      </div>
+      <div class="subject-block">
+        <div class="subject-label">VARC</div>
+        <ul class="checklist">
+          <li><span class="cb"></span>2 RC/day · PJ: 10×3 (anchor-sentence method deliberately) · PS: 8×2</li>
+        </ul>
+      </div>
+      <div class="week-mocks">
+        <div class="week-mocks-title">Mocks</div>
+        <div class="mock-row"><span class="mock-date">Jul 5</span> AIMCAT-SA2703 — TSD+T&W+early Algebra</div>
+        <div class="mock-row"><span class="mock-note">Post-mock Arithmetic audit — P&L+Ratio+TSD+T&W → 78%+</span></div>
+      </div>
+      <div class="week-sunday">
+        <div class="sunday-label">Sun Jul 5</div>
+        <div class="sunday-items">Formula card review · Re-solve 3 ELN · 15-Q mixed Arithmetic self-test — target 12/15</div>
+      </div>
+      <div class="week-checkin">
+        <div class="checkin-option"><div class="checkin-sq"></div> Crushed</div>
+        <div class="checkin-option"><div class="checkin-sq"></div> Good</div>
+        <div class="checkin-option"><div class="checkin-sq"></div> Struggled</div>
+        <div class="notes-label">Fix:</div><div class="notes-line"></div>
+      </div>
+    </div>
+
+    <!-- WEEK 5 -->
+    <div class="week-card">
+      <div class="week-header">
+        <div class="week-num">Week 5</div>
+        <div class="week-dates">Jul 6 – 12</div>
+      </div>
+      <div class="week-topics"><span>QA:</span> Linear/Quadratic Eq · AP/GP &nbsp;|&nbsp; <span>DILR:</span> Linear Seating · Circular Arrangements</div>
+      <div class="subject-block">
+        <div class="subject-label">QA</div>
+        <ul class="checklist">
+          <li><span class="cb"></span>Linear Eq — 2-var systems, word-to-equation translation</li>
+          <li><span class="cb"></span>Quadratic — factoring, square completion, discriminant, sum/product of roots</li>
+          <li><span class="cb"></span>AP/GP — nth term, sum of n terms, identifying sequence type</li>
+          <li><span class="cb"></span>25 problems/day — hardest focus: word → equation translation</li>
+        </ul>
+      </div>
+      <div class="subject-block">
+        <div class="subject-label">DILR</div>
+        <ul class="checklist">
+          <li><span class="cb"></span>2 full Linear Seating sets — 5–6 Q, never skip mid-set</li>
+          <li><span class="cb"></span>1 Circular arrangement · 1 Ordering/Ranking preview</li>
+        </ul>
+      </div>
+      <div class="subject-block">
+        <div class="subject-label">VARC</div>
+        <ul class="checklist">
+          <li><span class="cb"></span>2 RC/day — add science-heavy (prep for Phase 2 → 3/day)</li>
+          <li><span class="cb"></span>PJ: 10×3 · PS: 8×2</li>
+        </ul>
+      </div>
+      <div class="week-mocks">
+        <div class="week-mocks-title">Mocks</div>
+        <div class="mock-row"><span class="mock-date">Jul 11–15</span> A Pro — Phase 1 completion check</div>
+        <div class="mock-row"><span class="mock-note">Post-mock: completing 2 clean DI sets now?</span></div>
+      </div>
+      <div class="week-sunday">
+        <div class="sunday-label">Sun Jul 12</div>
+        <div class="sunday-items">Formula card review (30–35 min — stack is large) · Re-solve 3 ELN · Review any Arrangement you couldn't crack</div>
+      </div>
+      <div class="week-checkin">
+        <div class="checkin-option"><div class="checkin-sq"></div> Crushed</div>
+        <div class="checkin-option"><div class="checkin-sq"></div> Good</div>
+        <div class="checkin-option"><div class="checkin-sq"></div> Struggled</div>
+        <div class="notes-label">Fix:</div><div class="notes-line"></div>
+      </div>
+    </div>
+
+    <!-- WEEK 6 -->
+    <div class="week-card">
+      <div class="week-header">
+        <div class="week-num">Week 6 <span style="font-size:6pt;font-weight:400;color:#b00">▶ P1 Exit Jul 15 · P2 begins Jul 16</span></div>
+        <div class="week-dates">Jul 13 – 19</div>
+      </div>
+      <div class="week-topics"><span>QA:</span> Inequalities · Functions &nbsp;|&nbsp; <span>DILR:</span> Ordering · P1 Exit &nbsp;|&nbsp; <span>VARC:</span> 3 RC/day from Jul 16</div>
+      <div class="subject-block">
+        <div class="subject-label">QA</div>
+        <ul class="checklist">
+          <li><span class="cb"></span>Inequalities — number line, modulus, sign-change at zero</li>
+          <li><span class="cb"></span>Functions intro — domain, range, f(x) eval, piecewise</li>
+          <li><span class="cb"></span>20 Inequalities + 10 Functions problems</li>
+          <li><span class="cb cb-bold"></span><strong>P1 Exit (by Jul 15)</strong> — 10 mixed Arithmetic, timed, 78%+</li>
+        </ul>
+      </div>
+      <div class="subject-block">
+        <div class="subject-label">DILR</div>
+        <ul class="checklist">
+          <li><span class="cb"></span>2 Ordering/Ranking sets · Thu & Fri: DI + Arrangement back-to-back</li>
+          <li><span class="cb cb-bold"></span><strong>P1 Exit</strong> — 5-Q Table/Bar in &lt;8 min at 80%+ accuracy</li>
+        </ul>
+      </div>
+      <div class="subject-block">
+        <div class="subject-label">VARC</div>
+        <ul class="checklist">
+          <li><span class="cb"></span>Jul 13–15: 2 RC/day · PJ 10×3 · PS 8×2</li>
+          <li><span class="cb"></span><strong>From Jul 16:</strong> 3 RC/day · PJ 15×3 · PS 10×2</li>
+          <li><span class="cb cb-bold"></span><strong>P1 Exit</strong> — 2 passages in 22 min at 75%+</li>
+        </ul>
+      </div>
+      <div class="week-mocks">
+        <div class="week-mocks-title">Mocks</div>
+        <div class="mock-row"><span class="mock-date">Jul 18</span> C Pro — post-Phase 1, QA vs Jun 8 baseline</div>
+        <div class="mock-row"><span class="mock-date">Jul 19</span> AIMCAT-SA2705 — Algebra + DI full sets</div>
+      </div>
+      <div class="week-sunday">
+        <div class="sunday-label">Sun Jul 19</div>
+        <div class="sunday-items">Full P1 exit self-assessment · Reorganize formula cards by topic · Write Phase 2 targets: "By Aug 31 → QA 83–88 percentile"</div>
+      </div>
+      <div class="week-checkin">
+        <div class="checkin-option"><div class="checkin-sq"></div> Crushed</div>
+        <div class="checkin-option"><div class="checkin-sq"></div> Good</div>
+        <div class="checkin-option"><div class="checkin-sq"></div> Struggled</div>
+        <span style="font-size:6pt;margin-left:4px">P1 Exit:</span>
+        <div class="checkin-option"><div class="checkin-sq"></div> Done</div>
+        <div class="checkin-option"><div class="checkin-sq"></div> Partial</div>
+      </div>
+    </div>
+
+    <!-- WEEK 7 -->
+    <div class="week-card">
+      <div class="week-header">
+        <div class="week-num">Week 7 <span style="font-size:6pt;font-weight:400;color:var(--ink3)">Phase 2</span></div>
+        <div class="week-dates">Jul 20 – 26</div>
+      </div>
+      <div class="week-topics"><span>QA:</span> Number System — Divisibility · HCF/LCM &nbsp;|&nbsp; <span>DILR:</span> Full 6-Q Arrang. · Blood Relations</div>
+      <div class="subject-block">
+        <div class="subject-label">QA</div>
+        <ul class="checklist">
+          <li><span class="cb"></span>Divisibility rules 2–13 · Factors — count, sum, co-prime pairs</li>
+          <li><span class="cb"></span>HCF/LCM — prime factorization · word problems (bells, tiling)</li>
+          <li><span class="cb"></span>25 problems/day timed</li>
+          <li><span class="cb cb-bold"></span><strong>P2 daily rule:</strong> 1 hr evening harder Arith+Algebra mix — non-negotiable</li>
+        </ul>
+      </div>
+      <div class="subject-block">
+        <div class="subject-label">DILR</div>
+        <ul class="checklist">
+          <li><span class="cb"></span>2 full 6-Q Arrangement sets — no stopping mid-set</li>
+          <li><span class="cb"></span>1 Blood Relations set — draw family tree before any question</li>
+          <li><span class="cb cb-bold"></span><strong>60-sec overview rule:</strong> read full set before touching a question</li>
+        </ul>
+      </div>
+      <div class="subject-block">
+        <div class="subject-label">VARC</div>
+        <ul class="checklist">
+          <li><span class="cb"></span>3 RC/day at 75%+ · PJ: 15×3 (log chain vs guess) · PS: 10×2</li>
+          <li><span class="cb"></span>1 Odd Sentence Out set this week</li>
+        </ul>
+      </div>
+      <div class="week-mocks">
+        <div class="week-mocks-title">Mocks</div>
+        <div class="mock-row"><span class="mock-date">Jul 25–29</span> A Pro — Phase 2 early progress check</div>
+        <div class="mock-row"><span class="mock-note">Analysis: 2 DI sets + meaningful start on 1 Arrangement?</span></div>
+      </div>
+      <div class="week-sunday">
+        <div class="sunday-label">Sun Jul 26</div>
+        <div class="sunday-items">Formula card review · Re-solve 3 ELN · Evening harder-problems block every day this week?</div>
+      </div>
+      <div class="week-checkin">
+        <div class="checkin-option"><div class="checkin-sq"></div> Crushed</div>
+        <div class="checkin-option"><div class="checkin-sq"></div> Good</div>
+        <div class="checkin-option"><div class="checkin-sq"></div> Struggled</div>
+        <div class="notes-label">Fix:</div><div class="notes-line"></div>
+      </div>
+    </div>
+
+    <!-- WEEK 8 -->
+    <div class="week-card">
+      <div class="week-header">
+        <div class="week-num">Week 8 <span style="font-size:6pt;font-weight:400;color:var(--ink3)">Phase 2</span></div>
+        <div class="week-dates">Jul 27 – 31</div>
+      </div>
+      <div class="week-topics"><span>QA:</span> Remainders · Unit Digits &nbsp;|&nbsp; <span>DILR:</span> Mixed Arrangements Revision</div>
+      <div class="subject-block">
+        <div class="subject-label">QA</div>
+        <ul class="checklist">
+          <li><span class="cb"></span>Remainders — modular arithmetic, same-base patterns</li>
+          <li><span class="cb"></span>Unit digits — cyclicity 2,3,7,8 (cycle of 4) · 0,1,5,6 constant</li>
+          <li><span class="cb"></span>25 problems/day timed + evening 25 harder Arith+Algebra</li>
+        </ul>
+      </div>
+      <div class="subject-block">
+        <div class="subject-label">DILR</div>
+        <ul class="checklist">
+          <li><span class="cb"></span>2 mixed sets — 1 Linear/Circular + 1 Ordering/Blood Relations</li>
+          <li><span class="cb"></span>1 DI revision set — keep DI anchor sharp</li>
+          <li><span class="cb"></span>Self-check: 3 complete mixed sets in 40 min? (August target)</li>
+        </ul>
+      </div>
+      <div class="subject-block">
+        <div class="subject-label">VARC</div>
+        <ul class="checklist">
+          <li><span class="cb"></span>3 RC/day at 75%+ · PS: 10×2</li>
+          <li><span class="cb cb-bold"></span><strong>July milestone:</strong> PJ 15×3 → 62% accuracy by Jul 31</li>
+        </ul>
+      </div>
+      <div class="week-mocks">
+        <div class="week-mocks-title">Mocks</div>
+        <div class="mock-row"><span class="mock-date">Jul 25–29</span> A Pro (if not done W7)</div>
+        <div class="mock-row"><span class="mock-note">Post-mock: 2 DI sets + 1 Arrangement attempt?</span></div>
+      </div>
+      <div class="week-sunday">
+        <div class="sunday-label">Sun Jul 31 — End of July Review</div>
+        <div class="sunday-items">60–80+ formula cards by now (35 min) · Re-solve 4–5 ELN · Benchmark: VARC 93–96 · QA 79–84 · DILR 74–79? · Write 5-line self-assessment</div>
+      </div>
+      <div class="week-checkin">
+        <div style="font-size:6.5pt;margin-right:3px">Jul targets:</div>
+        <div class="checkin-option"><div class="checkin-sq"></div> VARC</div>
+        <div class="checkin-option"><div class="checkin-sq"></div> QA</div>
+        <div class="checkin-option"><div class="checkin-sq"></div> DILR</div>
+        <div class="notes-label">Notes:</div><div class="notes-line"></div>
+      </div>
+    </div>
+
+  </div><!-- /weeks-container -->
+
+  <!-- WHAT'S NEXT -->
+  <div class="phase-banner">What Comes Next — Aug through Nov</div>
+  <div class="later-row">
+    <div class="later-col">
+      <div class="later-col-title">August<br>Phase 2 Completion</div>
+      <div class="later-item">Geometry — Triangles, Circles, Coord Geometry</div>
+      <div class="later-item">Mensuration 2D+3D · Logs · Modern Math (PnC, Probability)</div>
+      <div class="later-item">Full Arith+Algebra revision sprint</div>
+      <div class="later-item">DILR: Tournaments, Scheduling, Matrix puzzles</div>
+      <div class="later-item">VARC: PJ → 70–72% · full timed section drills</div>
+      <div class="target-bar">Targets Aug<br><strong>VARC 95–97 · QA 83–88</strong><br>DILR 79–85 · Overall 91–95</div>
+    </div>
+    <div class="later-col">
+      <div class="later-col-title">September<br>Phase 3: Mock-Heavy</div>
+      <div class="later-item">2–3 full mocks/week · 3+ hr analysis each</div>
+      <div class="later-item">QA — no new topics, 40 CAT-level Qs in 90 min/morning</div>
+      <div class="later-item">DILR — 2 sets/session · 90-sec abandon rule</div>
+      <div class="later-item">Strategy locked by Sep 20</div>
+      <div class="target-bar">Targets Sep<br><strong>VARC 96–98 · QA 87–91</strong><br>DILR 84–89 · Overall 95–97</div>
+    </div>
+    <div class="later-col">
+      <div class="later-col-title">October<br>Phase 4: Optimization</div>
+      <div class="later-item">Oct 16: 4–5 mocks/week · 3 hr analysis · Error Log only · zero new topics</div>
+      <div class="later-item">Nov 8: 4 mocks/week · exam-slot simulation</div>
+      <div class="later-item">Consolidate formula cheat sheet</div>
+      <div class="target-bar">Targets Oct<br><strong>VARC 97–98.5 · QA 90–93</strong><br>DILR 88–92 · Overall 97–98.5</div>
+    </div>
+    <div class="later-col">
+      <div class="later-col-title">November<br>Final Stretch</div>
+      <div class="later-item">Nov 22–27 — no mocks · 20 QA/day · 1 RC · 1 easy DILR</div>
+      <div class="later-item">Nov 28 — no study. Walk, eat, sleep by 10:30 PM</div>
+      <div class="later-item">Nov 29 — <strong>CAT 2026</strong></div>
+      <div class="target-bar" style="margin-top:auto">
+        <strong>99+ PERCENTILE</strong><br>
+        Everything before this<br>day was preparation.
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div>Plan: Jun 8 – Jul 31, 2026 &nbsp;·&nbsp; See companion tracker sheet for daily grid</div>
+    <div><strong>Next: August + September Mission Plan</strong></div>
+  </div>
+
+</div>
+</body>
+<nav class="nav">
+  <a class="nav-brand" href="index.html">
+    <span class="nav-logo">CAT<span>.</span>prep</span>
+  </a>
+  <div class="nav-links">
+    <a href="index.html"      class="nav-link">Dashboard</a>
+    <a href="predictor.html" class="nav-link active">Call Predictor</a>
+      <a href="mock.html" class="nav-link">Mock Analysis</a>
+      <a href="https://docs.google.com/spreadsheets/d/1WfR_PO2uYE_8bQGWgFcEFO9f-YQhOI1kG5gVNRh6XAg/edit?usp=sharing"
+         target="_blank"
+         rel="noopener noreferrer"
+         class="nav-link">Resource Vault</a>
+         <a href="JuneJulyMission.html" class="nav-link">June-July Mission</a>
+  <div class="nav-right">
+    <span class="nav-pulse"></span>
+    <span class="nav-clock js-clock">--:--:--</span>
+  </div>
+</nav>
+</html>
