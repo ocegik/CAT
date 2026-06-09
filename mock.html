@@ -86,7 +86,6 @@ header{
 .icon-btn.del:hover{background:var(--acc-lo-bg);color:var(--acc-lo)}
 .icon-btn.edit:hover{background:var(--varc-bg);color:var(--varc)}
 
-
 /* ── Main layout ── */
 main{max-width:1320px;margin:0 auto;padding:1.75rem 1.5rem}
 
@@ -322,24 +321,24 @@ td{padding:10px 14px;font-size:13px;vertical-align:middle}
   .fgrid,.fgrid3{grid-template-columns:1fr 1fr}
   .search{width:130px}
 }
+
+/* ── Analytics ── */
+.analytics-wrap{margin-bottom:1.75rem}
+.analytics-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:.9rem}
+.analytics-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--faint);display:flex;align-items:center;gap:6px}
+.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.15rem;overflow:hidden}
+.chart-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--faint);margin-bottom:.75rem}
+.chart-full{grid-column:1/-1}
+.insight-bar{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+.insight-chip{background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:11px;color:var(--muted);white-space:nowrap}
+.insight-chip b{color:var(--text)}
+canvas{display:block}
+@media(max-width:700px){.charts-grid{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
-    <nav class="nav">
-  <a class="nav-brand" href="index.html">
-    <span class="nav-logo">CAT<span>.</span>prep</span>
-  </a>
-  <div class="nav-links">
-    <a href="index.html"      class="nav-link">Dashboard</a>
-    <a href="predictor.html" class="nav-link active">Call Predictor</a>
-      <a href="mock.html" class="nav-link">Mock Analysis</a>
-      <a href="https://docs.google.com/spreadsheets/d/1WfR_PO2uYE_8bQGWgFcEFO9f-YQhOI1kG5gVNRh6XAg/edit?usp=sharing"
-         target="_blank"
-         rel="noopener noreferrer"
-         class="nav-link">Resource Vault</a>
-         <a href="JuneJulyMission.html" class="nav-link">June-July Mission</a>
-
-  </div>
 
 <header>
   <div class="logo"><span class="logo-dot"></span> CAT Mock Tracker</div>
@@ -354,6 +353,50 @@ td{padding:10px 14px;font-size:13px;vertical-align:middle}
 
 <main>
   <div class="stats" id="statsGrid"></div>
+
+  <!-- ── Analytics Panel ── -->
+  <div class="analytics-wrap" id="analyticsWrap">
+    <div class="analytics-hdr">
+      <div class="analytics-lbl">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Analytics
+      </div>
+      <button class="btn btn-sm btn-ghost" id="analyticsToggleBtn" onclick="toggleAnalytics()">Hide charts</button>
+    </div>
+    <div id="chartsGrid" class="charts-grid">
+      <div class="chart-card chart-full">
+        <div class="chart-title">Score Trend — marks over time</div>
+        <canvas id="cTrend" height="180"></canvas>
+        <div class="insight-bar" id="insightBar"></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Accuracy Trend</div>
+        <canvas id="cAcc" height="210"></canvas>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Section Balance — full mocks</div>
+        <canvas id="cRadar" height="210"></canvas>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Avg Marks by Section</div>
+        <canvas id="cSecBar" height="210"></canvas>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Marks Distribution</div>
+        <canvas id="cHist" height="210"></canvas>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Correct vs Wrong — recent sessions</div>
+        <canvas id="cCvW" height="210"></canvas>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Performance by Source</div>
+        <canvas id="cSrc" height="210"></canvas>
+      </div>
+    </div>
+  </div>
+
+
 
   <div class="toolbar">
     <div class="toolbar-left">
@@ -932,10 +975,656 @@ function clearForm(){
   ['v','d','q'].forEach(p=>{ document.getElementById(p+'-titaFields').style.display='none'; });
   showSecTab('varc', document.getElementById('tab-varc'));
 }
-function renderAll(){ renderStats(); renderTable(); }
+function renderAll(){ renderStats(); renderTable(); renderCharts(); }
 let _tt;
 function toast(msg){ const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show'); clearTimeout(_tt); _tt=setTimeout(()=>el.classList.remove('show'),2400); }
 document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeModal(); closeConfirm(); } });
+
+
+/* ═══════════════════════════════════════════════════
+   ANALYTICS ENGINE
+   ═══════════════════════════════════════════════════ */
+const CC = {
+  varc:'#3B82F6',dilr:'#F59E0B',qa:'#22C55E',full:'#A78BFA',
+  hi:'#22C55E',md:'#F59E0B',lo:'#EF4444',
+  text:'#E2E4EA',muted:'#8B8FA6',faint:'#4A4E5C',
+  border:'#252830',bg:'#0D0F13',surface:'#13161B',s2:'#1A1D24',s3:'#21252E'
+};
+const SEC_COL = {VARC:CC.varc,DILR:CC.dilr,QA:CC.qa,'Full Mock':CC.full};
+
+let _analyticsVisible = true;
+function toggleAnalytics(){
+  _analyticsVisible = !_analyticsVisible;
+  document.getElementById('chartsGrid').style.display = _analyticsVisible ? '' : 'none';
+  document.getElementById('analyticsToggleBtn').textContent = _analyticsVisible ? 'Hide charts' : 'Show charts';
+  if(_analyticsVisible) renderCharts();
+}
+
+function setupCanvas(id){
+  const el = document.getElementById(id);
+  if(!el) return null;
+  const dpr = window.devicePixelRatio||1;
+  const card = el.closest('.chart-card');
+  const pad2 = 36; /* 1.15rem*2 */
+  const W = card.clientWidth - pad2;
+  const H = parseInt(el.getAttribute('height'))||200;
+  el.width  = W*dpr; el.height = H*dpr;
+  el.style.width = W+'px'; el.style.height = H+'px';
+  const ctx = el.getContext('2d');
+  ctx.scale(dpr,dpr);
+  return {ctx,w:W,h:H};
+}
+
+function emptyState(c, msg){
+  const {ctx,w,h} = c;
+  ctx.clearRect(0,0,w,h);
+  ctx.fillStyle = CC.faint;
+  ctx.font = '12px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(msg||'No data yet', w/2, h/2);
+}
+
+function setFont(ctx,sz,bold){
+  ctx.font = `${bold?'600 ':''}${sz}px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif`;
+}
+
+function gridH(ctx,y,x1,x2,col,dash){
+  ctx.save(); ctx.strokeStyle=col; ctx.lineWidth=1;
+  ctx.setLineDash(dash||[3,3]);
+  ctx.beginPath(); ctx.moveTo(x1,y); ctx.lineTo(x2,y); ctx.stroke();
+  ctx.restore();
+}
+
+function rRect(ctx,x,y,w,h,r){
+  if(!w||!h) return;
+  const [tl,tr,br,bl] = Array.isArray(r)?r:[r,r,r,r];
+  ctx.beginPath();
+  ctx.moveTo(x+tl,y); ctx.lineTo(x+w-tr,y);
+  ctx.quadraticCurveTo(x+w,y,x+w,y+tr);
+  ctx.lineTo(x+w,y+h-br);
+  ctx.quadraticCurveTo(x+w,y+h,x+w-br,y+h);
+  ctx.lineTo(x+bl,y+h);
+  ctx.quadraticCurveTo(x,y+h,x,y+h-bl);
+  ctx.lineTo(x,y+tl);
+  ctx.quadraticCurveTo(x,y,x+tl,y);
+  ctx.closePath();
+}
+
+function fmtD(d){ const [,m,day]=d.split('-'); return `${parseInt(day)}/${parseInt(m)}`; }
+
+/* ── 1. Score Trend ─────────────────────────────────── */
+function drawTrend(raw){
+  const c = setupCanvas('cTrend');
+  if(!c) return;
+  const {ctx,w,h} = c;
+  ctx.clearRect(0,0,w,h);
+  if(!raw.length){ emptyState(c,'Add entries to see your score trend'); return; }
+
+  const sorted = [...raw].sort((a,b)=>a.date.localeCompare(b.date));
+  const pad = {t:26,r:24,b:44,l:52};
+  const cw=w-pad.l-pad.r, ch=h-pad.t-pad.b;
+
+  /* group by section key */
+  const groups = {};
+  sorted.forEach((e,gi)=>{
+    const k = e.type==='full'?'Full Mock':e.section;
+    if(!groups[k]) groups[k]=[];
+    groups[k].push({...e, _gi:gi});
+  });
+
+  const allM = sorted.map(e=>e.totalMarks);
+  const minM = Math.min(...allM,0), maxM = Math.max(...allM,10);
+  const range = maxM-minM||1;
+  const xScale = i => pad.l + (sorted.length<2?cw/2:(i/(sorted.length-1))*cw);
+  const yScale = v => pad.t + ch - ((v-minM)/range)*ch;
+
+  /* gridlines */
+  setFont(ctx,10,false);
+  const nGrid=4;
+  for(let i=0;i<=nGrid;i++){
+    const v=minM+(i/nGrid)*(maxM-minM), y=yScale(v);
+    gridH(ctx,y,pad.l,w-pad.r,CC.border,[4,4]);
+    ctx.fillStyle=CC.faint; ctx.textAlign='right'; ctx.textBaseline='middle';
+    ctx.fillText(Math.round(v),pad.l-6,y);
+  }
+
+  /* x-axis labels */
+  const step=Math.max(1,Math.floor(sorted.length/7));
+  sorted.forEach((e,i)=>{
+    if(i%step!==0&&i!==sorted.length-1) return;
+    ctx.fillStyle=CC.faint; ctx.textAlign='center'; ctx.textBaseline='top';
+    ctx.fillText(fmtD(e.date),xScale(i),h-pad.b+6);
+  });
+
+  /* draw each group */
+  Object.entries(groups).forEach(([key,pts])=>{
+    const col = SEC_COL[key]||CC.muted;
+    const pp = pts.map(p=>({x:xScale(p._gi), y:yScale(p.totalMarks), m:p.totalMarks}));
+
+    /* area fill */
+    if(pp.length>1){
+      ctx.save();
+      ctx.beginPath();
+      pp.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));
+      ctx.lineTo(pp[pp.length-1].x, pad.t+ch);
+      ctx.lineTo(pp[0].x, pad.t+ch);
+      ctx.closePath();
+      const g=ctx.createLinearGradient(0,pad.t,0,pad.t+ch);
+      g.addColorStop(0,col+'30'); g.addColorStop(1,col+'00');
+      ctx.fillStyle=g; ctx.fill(); ctx.restore();
+    }
+
+    /* line */
+    if(pp.length>1){
+      ctx.save();
+      ctx.strokeStyle=col; ctx.lineWidth=2.5;
+      ctx.lineJoin='round'; ctx.lineCap='round';
+      ctx.beginPath();
+      pp.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));
+      ctx.stroke(); ctx.restore();
+    }
+
+    /* dots */
+    pp.forEach(p=>{
+      ctx.beginPath(); ctx.arc(p.x,p.y,4.5,0,Math.PI*2);
+      ctx.fillStyle=col; ctx.fill();
+      ctx.strokeStyle=CC.surface; ctx.lineWidth=2; ctx.stroke();
+    });
+  });
+
+  /* legend */
+  let lx=pad.l;
+  setFont(ctx,10,false);
+  Object.keys(groups).forEach(key=>{
+    const col=SEC_COL[key]||CC.muted;
+    ctx.fillStyle=col;
+    rRect(ctx,lx,5,14,5,2); ctx.fill();
+    ctx.fillStyle=CC.muted; ctx.textAlign='left'; ctx.textBaseline='middle';
+    ctx.fillText(key,lx+17,8);
+    lx+=ctx.measureText(key).width+32;
+  });
+}
+
+/* ── 2. Accuracy Trend ───────────────────────────────── */
+function drawAccTrend(raw){
+  const c=setupCanvas('cAcc');
+  if(!c) return;
+  const {ctx,w,h}=c;
+  ctx.clearRect(0,0,w,h);
+  if(!raw.length){ emptyState(c,'Add entries to see accuracy trend'); return; }
+
+  const sorted=[...raw].sort((a,b)=>a.date.localeCompare(b.date));
+  const pad={t:20,r:20,b:44,l:44};
+  const cw=w-pad.l-pad.r, ch=h-pad.t-pad.b;
+  const xScale=i=>pad.l+(sorted.length<2?cw/2:(i/(sorted.length-1))*cw);
+  const yScale=v=>pad.t+ch-(v/100)*ch;
+
+  /* coloured zones */
+  [[75,100,CC.hi+'10'],[50,75,CC.md+'10'],[0,50,CC.lo+'0A']].forEach(([lo,hi,col])=>{
+    ctx.fillStyle=col;
+    ctx.fillRect(pad.l,yScale(hi),cw,yScale(lo)-yScale(hi));
+  });
+
+  /* gridlines */
+  setFont(ctx,10,false);
+  [0,25,50,75,100].forEach(v=>{
+    const y=yScale(v);
+    gridH(ctx,y,pad.l,w-pad.r,CC.border,[4,4]);
+    ctx.fillStyle=CC.faint; ctx.textAlign='right'; ctx.textBaseline='middle';
+    ctx.fillText(v+'%',pad.l-5,y);
+  });
+
+  /* dashed threshold lines */
+  [50,75].forEach(v=>{
+    ctx.save();
+    ctx.strokeStyle=v===75?CC.hi:CC.md; ctx.lineWidth=1; ctx.globalAlpha=0.3;
+    ctx.setLineDash([6,4]);
+    ctx.beginPath(); ctx.moveTo(pad.l,yScale(v)); ctx.lineTo(w-pad.r,yScale(v)); ctx.stroke();
+    ctx.restore();
+    ctx.fillStyle=v===75?CC.hi:CC.md; ctx.textAlign='left'; ctx.textBaseline='bottom';
+    setFont(ctx,9,false);
+    ctx.fillText(v+'%',pad.l+4,yScale(v)-2);
+  });
+
+  /* moving average (window=3) */
+  if(sorted.length>=2){
+    const win=Math.min(3,sorted.length);
+    ctx.save(); ctx.strokeStyle=CC.muted; ctx.lineWidth=1.5;
+    ctx.globalAlpha=0.5; ctx.setLineDash([5,4]); ctx.lineJoin='round';
+    ctx.beginPath();
+    sorted.forEach((e,i)=>{
+      const lo=Math.max(0,i-win+1);
+      const avg=sorted.slice(lo,i+1).reduce((s,x)=>s+x.acc,0)/(i-lo+1);
+      i===0?ctx.moveTo(xScale(i),yScale(avg)):ctx.lineTo(xScale(i),yScale(avg));
+    });
+    ctx.stroke(); ctx.restore();
+  }
+
+  /* dots per entry */
+  sorted.forEach((e,i)=>{
+    const col=e.type==='full'?CC.full:(SEC_COL[e.section]||CC.muted);
+    const x=xScale(i),y=yScale(e.acc);
+    ctx.beginPath(); ctx.arc(x,y,4.5,0,Math.PI*2);
+    ctx.fillStyle=col; ctx.fill();
+    ctx.strokeStyle=CC.surface; ctx.lineWidth=2; ctx.stroke();
+  });
+
+  /* x labels */
+  const step=Math.max(1,Math.floor(sorted.length/6));
+  sorted.forEach((e,i)=>{
+    if(i%step!==0&&i!==sorted.length-1) return;
+    ctx.fillStyle=CC.faint; ctx.textAlign='center'; ctx.textBaseline='top';
+    setFont(ctx,10,false);
+    ctx.fillText(fmtD(e.date),xScale(i),h-pad.b+6);
+  });
+
+  /* legend */
+  const legs=[['VARC',CC.varc],['DILR',CC.dilr],['QA',CC.qa],['Full',CC.full]];
+  let lx=pad.l; setFont(ctx,10,false);
+  legs.forEach(([lbl,col])=>{
+    ctx.beginPath(); ctx.arc(lx+4,12,4,0,Math.PI*2);
+    ctx.fillStyle=col; ctx.fill();
+    ctx.fillStyle=CC.muted; ctx.textAlign='left'; ctx.textBaseline='middle';
+    ctx.fillText(lbl,lx+11,12);
+    lx+=ctx.measureText(lbl).width+24;
+  });
+}
+
+/* ── 3. Section Average Marks (horizontal bars) ────── */
+function drawSecBars(raw){
+  const c=setupCanvas('cSecBar');
+  if(!c) return;
+  const {ctx,w,h}=c;
+  ctx.clearRect(0,0,w,h);
+  if(!raw.length){ emptyState(c,'Add entries to see section performance'); return; }
+
+  const secs=[{k:'VARC',col:CC.varc},{k:'DILR',col:CC.dilr},{k:'QA',col:CC.qa},{k:'Full Mock',col:CC.full}];
+  const avgs=secs.map(({k})=>{
+    const items=k==='Full Mock'?raw.filter(e=>e.type==='full'):raw.filter(e=>e.type==='sectional'&&e.section===k);
+    if(!items.length) return null;
+    return {avg:items.reduce((s,e)=>s+e.totalMarks,0)/items.length, n:items.length,
+            avgAcc:items.reduce((s,e)=>s+e.acc,0)/items.length};
+  });
+
+  const vals=avgs.filter(Boolean).map(v=>Math.abs(v.avg));
+  const maxV=vals.length?Math.max(...vals,10):10;
+
+  const pad={t:12,r:16,b:12,l:88};
+  const cw=w-pad.l-pad.r, ch=h-pad.t-pad.b;
+  const barH=Math.min(30,(ch/secs.length)*0.58);
+  const barGap=ch/secs.length;
+
+  secs.forEach(({k,col},i)=>{
+    const av=avgs[i];
+    const y=pad.t+i*barGap+(barGap-barH)/2;
+
+    setFont(ctx,11,false);
+    ctx.fillStyle=col; ctx.textAlign='right'; ctx.textBaseline='middle';
+    ctx.fillText(k,pad.l-10,y+barH/2);
+
+    /* bg track */
+    ctx.fillStyle=CC.s2;
+    rRect(ctx,pad.l,y,cw,barH,4); ctx.fill();
+
+    if(!av){
+      setFont(ctx,10,false);
+      ctx.fillStyle=CC.faint; ctx.textAlign='left'; ctx.textBaseline='middle';
+      ctx.fillText('No data yet',pad.l+8,y+barH/2); return;
+    }
+
+    const bw=Math.max((Math.abs(av.avg)/maxV)*cw, av.avg!==0?2:0);
+
+    /* filled bar */
+    ctx.fillStyle=col;
+    rRect(ctx,pad.l,y,bw,barH,[0,4,4,0]); ctx.fill();
+
+    /* value label */
+    const vLabel=`${av.avg.toFixed(1)}`;
+    setFont(ctx,11,true);
+    ctx.fillStyle=CC.text; ctx.textAlign='left'; ctx.textBaseline='middle';
+    ctx.fillText(vLabel,pad.l+bw+8,y+barH/2-5);
+    setFont(ctx,10,false);
+    ctx.fillStyle=CC.faint;
+    ctx.fillText(`${av.avgAcc.toFixed(0)}% acc · n=${av.n}`,pad.l+bw+8,y+barH/2+7);
+  });
+}
+
+/* ── 4. Radar — VARC/DILR/QA balance ────────────────── */
+function drawRadar(raw){
+  const c=setupCanvas('cRadar');
+  if(!c) return;
+  const {ctx,w,h}=c;
+  ctx.clearRect(0,0,w,h);
+
+  const full=raw.filter(e=>e.type==='full');
+  if(!full.length){ emptyState(c,'Add full mocks to see section balance'); return; }
+
+  const axes=['VARC','DILR','QA'];
+  const cols=[CC.varc,CC.dilr,CC.qa];
+  const avgMarks=axes.map(ax=>full.reduce((s,e)=>s+e.breakdown[ax.toLowerCase()].marks,0)/full.length);
+  const avgAcc  =axes.map(ax=>full.reduce((s,e)=>s+e.breakdown[ax.toLowerCase()].acc,0)/full.length);
+
+  const maxV=Math.max(...avgMarks.map(Math.abs),20);
+  const cx=w/2, cy=h/2+8;
+  const R=Math.min(cx-50,cy-50);
+  const n=3;
+  const ang=i=>(i/n)*Math.PI*2-Math.PI/2;
+
+  /* rings */
+  ctx.setLineDash([3,3]);
+  [0.33,0.66,1].forEach(f=>{
+    ctx.strokeStyle=CC.border; ctx.lineWidth=1;
+    ctx.beginPath();
+    for(let i=0;i<n;i++){
+      const x=cx+Math.cos(ang(i))*R*f, y=cy+Math.sin(ang(i))*R*f;
+      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    }
+    ctx.closePath(); ctx.stroke();
+  });
+  ctx.setLineDash([]);
+
+  /* spokes */
+  axes.forEach((_,i)=>{
+    ctx.strokeStyle=CC.border; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(cx,cy);
+    ctx.lineTo(cx+Math.cos(ang(i))*R,cy+Math.sin(ang(i))*R);
+    ctx.stroke();
+  });
+
+  /* ring value labels */
+  setFont(ctx,9,false); ctx.fillStyle=CC.faint; ctx.textAlign='center'; ctx.textBaseline='bottom';
+  [0.33,0.66,1].forEach(f=>ctx.fillText(Math.round(maxV*f),cx,cy-R*f-3));
+
+  /* data polygon */
+  ctx.save();
+  ctx.strokeStyle=CC.full; ctx.lineWidth=2.5;
+  ctx.fillStyle='rgba(167,139,250,0.18)';
+  ctx.beginPath();
+  avgMarks.forEach((v,i)=>{
+    const r=(Math.max(v,0)/maxV)*R;
+    const x=cx+Math.cos(ang(i))*r, y=cy+Math.sin(ang(i))*r;
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  });
+  ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.restore();
+
+  /* vertex dots + axis labels */
+  avgMarks.forEach((v,i)=>{
+    const r=(Math.max(v,0)/maxV)*R;
+    const vx=cx+Math.cos(ang(i))*r, vy=cy+Math.sin(ang(i))*r;
+    ctx.beginPath(); ctx.arc(vx,vy,5,0,Math.PI*2);
+    ctx.fillStyle=cols[i]; ctx.fill();
+    ctx.strokeStyle=CC.surface; ctx.lineWidth=2; ctx.stroke();
+
+    const lR=R+28;
+    const lx=cx+Math.cos(ang(i))*lR, ly=cy+Math.sin(ang(i))*lR;
+    setFont(ctx,11,true); ctx.fillStyle=cols[i];
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(axes[i],lx,ly-7);
+    setFont(ctx,10,false); ctx.fillStyle=CC.muted;
+    ctx.fillText(`${v.toFixed(1)}m · ${avgAcc[i].toFixed(0)}%`,lx,ly+7);
+  });
+}
+
+/* ── 5. Marks Distribution ──────────────────────────── */
+function drawHistogram(raw){
+  const c=setupCanvas('cHist');
+  if(!c) return;
+  const {ctx,w,h}=c;
+  ctx.clearRect(0,0,w,h);
+  if(!raw.length){ emptyState(c,'Add entries to see marks distribution'); return; }
+
+  const marks=raw.map(e=>e.totalMarks);
+  const minM=Math.floor(Math.min(...marks)/10)*10;
+  const maxM=Math.ceil( Math.max(...marks)/10)*10;
+  const spread=maxM-minM||10;
+  const nBins=Math.min(8,Math.max(4,Math.ceil(spread/10)));
+  const binSz=Math.ceil(spread/nBins);
+  const bins=[];
+  for(let b=minM;bins.length<nBins;b+=binSz) bins.push({min:b,max:b+binSz,count:0});
+  marks.forEach(m=>{
+    const bi=bins.findIndex(b=>m>=b.min&&m<b.max);
+    if(bi>=0) bins[bi].count++;
+    else if(bins.length&&m>=bins[bins.length-1].min) bins[bins.length-1].count++;
+  });
+
+  const maxC=Math.max(...bins.map(b=>b.count),1);
+  const mean=marks.reduce((s,v)=>s+v,0)/marks.length;
+  const pad={t:26,r:16,b:44,l:36};
+  const cw=w-pad.l-pad.r, ch=h-pad.t-pad.b;
+  const bw=cw/bins.length;
+
+  /* y grid */
+  setFont(ctx,10,false);
+  [0,Math.ceil(maxC/2),maxC].forEach(v=>{
+    const y=pad.t+ch-(v/maxC)*ch;
+    gridH(ctx,y,pad.l,w-pad.r,CC.border,[4,4]);
+    ctx.fillStyle=CC.faint; ctx.textAlign='right'; ctx.textBaseline='middle';
+    ctx.fillText(v,pad.l-5,y);
+  });
+
+  /* bars */
+  bins.forEach((bin,i)=>{
+    const bh=(bin.count/maxC)*ch;
+    const x=pad.l+i*bw+2, bw2=bw-4;
+    const y=pad.t+ch-bh;
+    const mid=(bin.min+bin.max)/2;
+    const col=mid>=100?CC.hi:mid>=50?CC.md:CC.lo;
+
+    /* bg column */
+    ctx.fillStyle=col+'12';
+    ctx.fillRect(x,pad.t,bw2,ch);
+
+    /* bar */
+    if(bh>0){
+      ctx.fillStyle=col;
+      rRect(ctx,x,y,bw2,bh,[3,3,0,0]); ctx.fill();
+    }
+
+    /* count */
+    if(bin.count>0){
+      setFont(ctx,10,true); ctx.fillStyle=CC.text;
+      ctx.textAlign='center'; ctx.textBaseline='bottom';
+      ctx.fillText(bin.count,x+bw2/2,y-2);
+    }
+
+    /* x label */
+    setFont(ctx,9,false); ctx.fillStyle=CC.faint;
+    ctx.textAlign='center'; ctx.textBaseline='top';
+    ctx.fillText(bin.min,x+bw2/2,h-pad.b+6);
+  });
+
+  /* mean line */
+  const meanX=pad.l+((mean-minM)/spread)*cw;
+  if(meanX>=pad.l&&meanX<=w-pad.r){
+    ctx.save(); ctx.strokeStyle=CC.text; ctx.lineWidth=1.5;
+    ctx.setLineDash([5,3]); ctx.globalAlpha=0.5;
+    ctx.beginPath(); ctx.moveTo(meanX,pad.t); ctx.lineTo(meanX,pad.t+ch); ctx.stroke();
+    ctx.restore();
+    setFont(ctx,9,false); ctx.fillStyle=CC.muted;
+    ctx.textAlign='center'; ctx.textBaseline='bottom';
+    ctx.fillText(`avg ${mean.toFixed(0)}`,meanX,pad.t-2);
+  }
+}
+
+/* ── 6. Correct vs Wrong (stacked bar) ─────────────── */
+function drawCvW(raw){
+  const c=setupCanvas('cCvW');
+  if(!c) return;
+  const {ctx,w,h}=c;
+  ctx.clearRect(0,0,w,h);
+  if(!raw.length){ emptyState(c,'Add entries to see attempt breakdown'); return; }
+
+  const sorted=[...raw].sort((a,b)=>a.date.localeCompare(b.date)).slice(-14);
+  const pad={t:26,r:16,b:52,l:38};
+  const cw=w-pad.l-pad.r, ch=h-pad.t-pad.b;
+  const bw=cw/sorted.length;
+  const gap=Math.max(2,bw*0.18);
+  const maxAtt=Math.max(...sorted.map(e=>e.totalAtt),1);
+
+  /* grid */
+  setFont(ctx,10,false);
+  [0,Math.ceil(maxAtt/2),maxAtt].forEach(v=>{
+    const y=pad.t+ch-(v/maxAtt)*ch;
+    gridH(ctx,y,pad.l,w-pad.r,CC.border,[4,4]);
+    ctx.fillStyle=CC.faint; ctx.textAlign='right'; ctx.textBaseline='middle';
+    ctx.fillText(v,pad.l-5,y);
+  });
+
+  sorted.forEach((e,i)=>{
+    const wrong=e.type==='full'?((e.varc?.mcqW||0)+(e.dilr?.mcqW||0)+(e.qa?.mcqW||0)):(e.mcqW||0);
+    const right=e.totalRight;
+    const col=e.type==='full'?CC.full:(SEC_COL[e.section]||CC.muted);
+    const x=pad.l+i*bw+gap, barW=bw-gap*2;
+    let yOff=pad.t+ch;
+
+    /* wrong */
+    const wH=(wrong/maxAtt)*ch;
+    yOff-=wH; ctx.fillStyle=CC.lo; ctx.fillRect(x,yOff,barW,wH);
+
+    /* right */
+    const rH=(right/maxAtt)*ch;
+    yOff-=rH;
+    ctx.fillStyle=CC.hi;
+    rRect(ctx,x,yOff,barW,rH,[2,2,0,0]); ctx.fill();
+
+    /* section colour stripe */
+    ctx.fillStyle=col; ctx.fillRect(x,pad.t+ch+4,barW,3);
+
+    /* date label */
+    ctx.fillStyle=CC.faint; ctx.textAlign='center'; ctx.textBaseline='top';
+    setFont(ctx,9,false);
+    ctx.fillText(fmtD(e.date),x+barW/2,pad.t+ch+11);
+
+    /* section initial */
+    const sl=e.type==='full'?'F':(e.section||'?')[0];
+    ctx.fillStyle=col; setFont(ctx,9,true);
+    ctx.fillText(sl,x+barW/2,pad.t+ch+22);
+
+    /* accuracy badge on top bar */
+    if(right+wrong>0){
+      const acc=(right/(right+wrong)*100).toFixed(0)+'%';
+      setFont(ctx,8,false); ctx.fillStyle=CC.muted;
+      ctx.fillText(acc,x+barW/2,yOff-3);
+    }
+  });
+
+  /* legend */
+  setFont(ctx,10,false);
+  [[CC.hi,'Correct'],[CC.lo,'Wrong']].forEach(([col,lbl],i)=>{
+    const lx=pad.l+i*72;
+    ctx.fillStyle=col; ctx.fillRect(lx,8,10,8);
+    ctx.fillStyle=CC.muted; ctx.textAlign='left'; ctx.textBaseline='middle';
+    ctx.fillText(lbl,lx+13,12);
+  });
+}
+
+/* ── 7. Source Performance ─────────────────────────── */
+function drawSourceBars(raw){
+  const c=setupCanvas('cSrc');
+  if(!c) return;
+  const {ctx,w,h}=c;
+  ctx.clearRect(0,0,w,h);
+  if(!raw.length){ emptyState(c,'Add entries to see performance by source'); return; }
+
+  const srcMap={};
+  raw.forEach(e=>{
+    const s=(e.source||'Unknown').trim();
+    if(!srcMap[s]) srcMap[s]={sum:0,accSum:0,n:0};
+    srcMap[s].sum+=e.totalMarks; srcMap[s].accSum+=e.acc; srcMap[s].n++;
+  });
+
+  const srcs=Object.entries(srcMap)
+    .map(([name,{sum,accSum,n}])=>({name,avg:sum/n,avgAcc:accSum/n,n}))
+    .sort((a,b)=>b.avg-a.avg).slice(0,7);
+
+  const maxV=Math.max(...srcs.map(s=>Math.abs(s.avg)),10);
+  const pad={t:12,r:16,b:12,l:88};
+  const cw=w-pad.l-pad.r, ch=h-pad.t-pad.b;
+  const barH=Math.min(28,(ch/srcs.length)*0.58);
+  const barGap=ch/srcs.length;
+
+  srcs.forEach((s,i)=>{
+    const y=pad.t+i*barGap+(barGap-barH)/2;
+    const bw=Math.max((Math.max(s.avg,0)/maxV)*cw,s.avg>0?2:0);
+    const col=s.avg>=100?CC.hi:s.avg>=50?CC.md:CC.lo;
+    const nm=s.name.length>11?s.name.slice(0,10)+'…':s.name;
+
+    setFont(ctx,11,false);
+    ctx.fillStyle=CC.muted; ctx.textAlign='right'; ctx.textBaseline='middle';
+    ctx.fillText(nm,pad.l-8,y+barH/2);
+
+    /* bg */
+    ctx.fillStyle=CC.s2; rRect(ctx,pad.l,y,cw,barH,4); ctx.fill();
+
+    /* bar */
+    ctx.fillStyle=col; rRect(ctx,pad.l,y,bw,barH,[0,4,4,0]); ctx.fill();
+
+    /* labels */
+    setFont(ctx,11,true); ctx.fillStyle=CC.text;
+    ctx.textAlign='left'; ctx.textBaseline='middle';
+    ctx.fillText(`${s.avg.toFixed(1)}`,pad.l+bw+8,y+barH/2-5);
+    setFont(ctx,10,false); ctx.fillStyle=CC.faint;
+    ctx.fillText(`${s.avgAcc.toFixed(0)}% acc · n=${s.n}`,pad.l+bw+8,y+barH/2+7);
+  });
+}
+
+/* ── Insight chips ──────────────────────────────────── */
+function renderInsights(raw){
+  const el=document.getElementById('insightBar');
+  if(!el) return;
+  if(!raw.length){ el.innerHTML=''; return; }
+
+  const chips=[];
+
+  /* streak */
+  const sorted=[...raw].sort((a,b)=>a.date.localeCompare(b.date));
+  const last5=sorted.slice(-5);
+  const improving=last5.length>=3&&last5[last5.length-1].totalMarks>last5[0].totalMarks;
+  if(improving) chips.push(`📈 <b>Upward trend</b> — last ${last5.length} entries`);
+
+  /* best section */
+  const secs=['VARC','DILR','QA'];
+  const secAvgs=secs.map(s=>{
+    const items=raw.filter(e=>e.type==='full');
+    if(!items.length) return null;
+    return {s,avg:items.reduce((sum,e)=>sum+e.breakdown[s.toLowerCase()].marks,0)/items.length};
+  }).filter(Boolean);
+  if(secAvgs.length){
+    const best=secAvgs.reduce((a,b)=>a.avg>b.avg?a:b);
+    const worst=secAvgs.reduce((a,b)=>a.avg<b.avg?a:b);
+    chips.push(`💪 Best section: <b>${best.s}</b> (avg ${best.avg.toFixed(0)}m)`);
+    chips.push(`🎯 Focus area: <b>${worst.s}</b> (avg ${worst.avg.toFixed(0)}m)`);
+  }
+
+  /* overall accuracy */
+  const avgAcc=raw.reduce((s,e)=>s+e.acc,0)/raw.length;
+  const accTier=avgAcc>=75?'Strong':avgAcc>=50?'Building':'Needs work';
+  chips.push(`Avg accuracy: <b>${avgAcc.toFixed(1)}%</b> — ${accTier}`);
+
+  /* consistency (std dev of marks) */
+  const marks=raw.map(e=>e.totalMarks);
+  const mean=marks.reduce((s,v)=>s+v,0)/marks.length;
+  const std=Math.sqrt(marks.reduce((s,v)=>s+Math.pow(v-mean,2),0)/marks.length);
+  chips.push(`Consistency σ: <b>${std.toFixed(1)}</b> ${std<20?'(consistent ✓)':std<40?'(some variance)':'(high variance)'}`);
+
+  el.innerHTML=chips.map(t=>`<div class="insight-chip">${t}</div>`).join('');
+}
+
+function renderCharts(){
+  if(!_analyticsVisible) return;
+  const raw=entries.map(e=>({...e,...calcEntry(e)})).sort((a,b)=>a.date.localeCompare(b.date));
+  drawTrend(raw);
+  drawAccTrend(raw);
+  drawSecBars(raw);
+  drawRadar(raw);
+  drawHistogram(raw);
+  drawCvW(raw);
+  drawSourceBars(raw);
+  renderInsights(raw);
+}
+
+let _rzTimer;
+window.addEventListener('resize',()=>{ clearTimeout(_rzTimer); _rzTimer=setTimeout(renderCharts,150); });
 
 load(); renderAll();
 </script>
